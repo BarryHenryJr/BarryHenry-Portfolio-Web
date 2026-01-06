@@ -47,10 +47,10 @@ const getRingRadius = (ring: TechItem['ring']) => {
 
 export function TechRadar() {
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6">
+    <div className="rounded-lg border border-border bg-card p-6">
       <div className="flex items-center gap-2 mb-6">
-        <Radar className="h-5 w-5 text-slate-400" />
-        <h3 className="text-lg font-semibold text-slate-100">Technology Radar</h3>
+        <Radar className="h-5 w-5 text-muted-foreground" />
+        <h3 className="text-lg font-semibold text-card-foreground">Technology Radar</h3>
       </div>
 
       <div className="relative w-full aspect-square max-w-md mx-auto">
@@ -74,16 +74,16 @@ export function TechRadar() {
           <line x1="10" y1="100" x2="190" y2="100" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.5" />
 
           {/* Ring labels */}
-          <text x="100" y="35" textAnchor="middle" className="fill-slate-400 text-xs font-medium">ADOPT</text>
-          <text x="100" y="60" textAnchor="middle" className="fill-slate-400 text-xs font-medium">TRIAL</text>
-          <text x="100" y="85" textAnchor="middle" className="fill-slate-400 text-xs font-medium">ASSESS</text>
-          <text x="100" y="105" textAnchor="middle" className="fill-slate-400 text-xs font-medium">HOLD</text>
+          <text x="100" y="35" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">ADOPT</text>
+          <text x="100" y="60" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">TRIAL</text>
+          <text x="100" y="85" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">ASSESS</text>
+          <text x="100" y="105" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">HOLD</text>
 
           {/* Quadrant labels */}
-          <text x="150" y="45" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">LANGUAGES</text>
-          <text x="50" y="45" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">PLATFORMS</text>
-          <text x="50" y="155" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">TOOLS</text>
-          <text x="150" y="155" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">TECHNIQUES</text>
+          <text x="150" y="45" textAnchor="middle" className="fill-foreground text-xs font-semibold">LANGUAGES</text>
+          <text x="50" y="45" textAnchor="middle" className="fill-foreground text-xs font-semibold">PLATFORMS</text>
+          <text x="50" y="155" textAnchor="middle" className="fill-foreground text-xs font-semibold">TOOLS</text>
+          <text x="150" y="155" textAnchor="middle" className="fill-foreground text-xs font-semibold">TECHNIQUES</text>
 
           {/* Technology items */}
           {techItems.map((item) => {
@@ -107,7 +107,7 @@ export function TechRadar() {
                   x={x}
                   y={y - 8}
                   textAnchor="middle"
-                  className="fill-slate-300 text-xs font-medium pointer-events-none"
+                  className="fill-foreground text-xs font-medium pointer-events-none"
                 >
                   {item.name}
                 </text>
@@ -120,19 +120,19 @@ export function TechRadar() {
         <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-400"></div>
-            <span className="text-slate-400">Adopt</span>
+            <span className="text-muted-foreground">Adopt</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-blue-500/20 border border-blue-400"></div>
-            <span className="text-slate-400">Trial</span>
+            <span className="text-muted-foreground">Trial</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-400"></div>
-            <span className="text-slate-400">Assess</span>
+            <span className="text-muted-foreground">Assess</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-400"></div>
-            <span className="text-slate-400">Hold</span>
+            <span className="text-muted-foreground">Hold</span>
           </div>
         </div>
       </div>

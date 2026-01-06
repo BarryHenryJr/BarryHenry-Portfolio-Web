@@ -66,7 +66,8 @@ export function CommandMenu() {
   }
 
   function toggleTheme() {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const currentTheme = theme || "dark"; // Default to dark if theme is undefined
+    setTheme(currentTheme === "dark" ? "light" : "dark");
     setOpen(false);
   }
 
@@ -79,7 +80,7 @@ export function CommandMenu() {
           exit={{ opacity: 0, scale: 0.98, y: 8 }}
           transition={{ duration: 0.14, ease: "easeOut" }}
         >
-          <Command className="bg-slate-950">
+          <Command className="bg-popover text-popover-foreground border-border">
             <CommandInput placeholder="Search pages and actions…" />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
@@ -89,9 +90,9 @@ export function CommandMenu() {
                   const Icon = item.icon;
                   return (
                     <CommandItem key={item.id} onSelect={() => goToPage(item)}>
-                      <Icon className="h-4 w-4 text-slate-500" />
+                      <Icon className="h-4 w-4 text-muted-foreground" />
                       <span className="flex-1">{item.label}</span>
-                      <ArrowRight className="h-4 w-4 text-slate-600" />
+                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     </CommandItem>
                   );
                 })}
@@ -101,12 +102,12 @@ export function CommandMenu() {
 
               <CommandGroup heading="Social">
                 <CommandItem onSelect={() => openExternal(GITHUB_URL)}>
-                  <Github className="h-4 w-4 text-slate-500" />
+                  <Github className="h-4 w-4 text-muted-foreground" />
                   <span className="flex-1">GitHub</span>
                   <CommandShortcut>↗</CommandShortcut>
                 </CommandItem>
                 <CommandItem onSelect={() => openExternal(LINKEDIN_URL)}>
-                  <Linkedin className="h-4 w-4 text-slate-500" />
+                  <Linkedin className="h-4 w-4 text-muted-foreground" />
                   <span className="flex-1">LinkedIn</span>
                   <CommandShortcut>↗</CommandShortcut>
                 </CommandItem>
@@ -116,19 +117,19 @@ export function CommandMenu() {
 
               <CommandGroup heading="General">
                 <CommandItem onSelect={() => void copyEmail()}>
-                  <Copy className="h-4 w-4 text-slate-500" />
+                  <Copy className="h-4 w-4 text-muted-foreground" />
                   <span className="flex-1">Copy Email</span>
                 </CommandItem>
                 <CommandItem onSelect={toggleTheme}>
-                  <SunMoon className="h-4 w-4 text-slate-500" />
+                  <SunMoon className="h-4 w-4 text-muted-foreground" />
                   <span className="flex-1">Toggle Theme</span>
                 </CommandItem>
               </CommandGroup>
             </CommandList>
 
-            <div className="flex items-center justify-between border-t border-slate-800 px-4 py-2 text-xs text-slate-500">
+            <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
               <span>Tip: Press Esc to close</span>
-              <span className="rounded-md border border-slate-800 bg-slate-900 px-2 py-1">⌘K / CtrlK</span>
+              <span className="rounded-md border border-border bg-muted px-2 py-1">⌘K / CtrlK</span>
             </div>
           </Command>
         </motion.div>
