@@ -1,53 +1,138 @@
 import { Radar } from "lucide-react";
 
+type TechItem = {
+  name: string;
+  quadrant: 'techniques' | 'tools' | 'platforms' | 'languages';
+  ring: 'adopt' | 'trial' | 'assess' | 'hold';
+  x: number; // percentage from center (0-100)
+  y: number; // percentage from center (0-100)
+};
+
+const techItems: TechItem[] = [
+  // Languages & Frameworks (Top-Right)
+  { name: 'TypeScript', quadrant: 'languages', ring: 'adopt', x: 65, y: -35 },
+  { name: 'React', quadrant: 'languages', ring: 'adopt', x: 75, y: -25 },
+  { name: 'Next.js', quadrant: 'languages', ring: 'trial', x: 45, y: -45 },
+
+  // Platforms (Top-Left)
+  { name: 'Vercel', quadrant: 'platforms', ring: 'adopt', x: -60, y: -40 },
+  { name: 'Node.js', quadrant: 'platforms', ring: 'adopt', x: -70, y: -30 },
+
+  // Tools (Bottom-Left)
+  { name: 'Tailwind', quadrant: 'tools', ring: 'adopt', x: -55, y: 55 },
+  { name: 'Git', quadrant: 'tools', ring: 'adopt', x: -65, y: 45 },
+
+  // Techniques (Bottom-Right)
+  { name: 'Type Safety', quadrant: 'techniques', ring: 'adopt', x: 70, y: 40 },
+  { name: 'SSR', quadrant: 'techniques', ring: 'trial', x: 50, y: 60 },
+];
+
+const getRingColor = (ring: TechItem['ring']) => {
+  switch (ring) {
+    case 'adopt': return 'text-green-400 bg-green-500/20';
+    case 'trial': return 'text-blue-400 bg-blue-500/20';
+    case 'assess': return 'text-yellow-400 bg-yellow-500/20';
+    case 'hold': return 'text-red-400 bg-red-500/20';
+  }
+};
+
+const getRingRadius = (ring: TechItem['ring']) => {
+  switch (ring) {
+    case 'adopt': return 25;
+    case 'trial': return 50;
+    case 'assess': return 75;
+    case 'hold': return 90;
+  }
+};
+
 export function TechRadar() {
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6">
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-6">
         <Radar className="h-5 w-5 text-slate-400" />
         <h3 className="text-lg font-semibold text-slate-100">Technology Radar</h3>
       </div>
 
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-3 rounded-md bg-slate-800/50 border border-slate-700">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-300">React</span>
-              <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">Adopt</span>
-            </div>
-            <div className="w-full bg-slate-700 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full w-4/5"></div>
-            </div>
-          </div>
+      <div className="relative w-full aspect-square max-w-md mx-auto">
+        {/* Radar Grid */}
+        <svg
+          viewBox="0 0 200 200"
+          className="w-full h-full"
+          style={{ filter: 'drop-shadow(0 0 10px rgba(51, 65, 85, 0.3))' }}
+        >
+          {/* Background */}
+          <rect width="200" height="200" fill="transparent" />
 
-          <div className="p-3 rounded-md bg-slate-800/50 border border-slate-700">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-300">TypeScript</span>
-              <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">Adopt</span>
-            </div>
-            <div className="w-full bg-slate-700 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full w-5/6"></div>
-            </div>
-          </div>
+          {/* Concentric rings */}
+          <circle cx="100" cy="100" r="90" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
+          <circle cx="100" cy="100" r="75" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
+          <circle cx="100" cy="100" r="50" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
+          <circle cx="100" cy="100" r="25" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
 
-          <div className="p-3 rounded-md bg-slate-800/50 border border-slate-700">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-300">Next.js</span>
-              <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400">Trial</span>
-            </div>
-            <div className="w-full bg-slate-700 rounded-full h-2">
-              <div className="bg-blue-500 h-2 rounded-full w-3/5"></div>
-            </div>
-          </div>
+          {/* Quadrant lines */}
+          <line x1="100" y1="10" x2="100" y2="190" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.5" />
+          <line x1="10" y1="100" x2="190" y2="100" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.5" />
 
-          <div className="p-3 rounded-md bg-slate-800/50 border border-slate-700">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-300">Tailwind</span>
-              <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">Adopt</span>
-            </div>
-            <div className="w-full bg-slate-700 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full w-4/6"></div>
-            </div>
+          {/* Ring labels */}
+          <text x="100" y="35" textAnchor="middle" className="fill-slate-400 text-xs font-medium">ADOPT</text>
+          <text x="100" y="60" textAnchor="middle" className="fill-slate-400 text-xs font-medium">TRIAL</text>
+          <text x="100" y="85" textAnchor="middle" className="fill-slate-400 text-xs font-medium">ASSESS</text>
+          <text x="100" y="105" textAnchor="middle" className="fill-slate-400 text-xs font-medium">HOLD</text>
+
+          {/* Quadrant labels */}
+          <text x="150" y="45" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">LANGUAGES</text>
+          <text x="50" y="45" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">PLATFORMS</text>
+          <text x="50" y="155" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">TOOLS</text>
+          <text x="150" y="155" textAnchor="middle" className="fill-slate-300 text-xs font-semibold">TECHNIQUES</text>
+
+          {/* Technology items */}
+          {techItems.map((item) => {
+            const radius = getRingRadius(item.ring);
+            const angle = Math.atan2(item.y, item.x);
+            const distance = Math.sqrt(item.x * item.x + item.y * item.y);
+            const normalizedDistance = Math.min(distance / 90, 1) * radius;
+            const x = 100 + Math.cos(angle) * normalizedDistance;
+            const y = 100 + Math.sin(angle) * normalizedDistance;
+
+            return (
+              <g key={item.name}>
+                <circle
+                  cx={x}
+                  cy={y}
+                  r="4"
+                  className={`fill-current ${getRingColor(item.ring)}`}
+                  style={{ filter: 'drop-shadow(0 0 4px currentColor)' }}
+                />
+                <text
+                  x={x}
+                  y={y - 8}
+                  textAnchor="middle"
+                  className="fill-slate-300 text-xs font-medium pointer-events-none"
+                >
+                  {item.name}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* Legend */}
+        <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-400"></div>
+            <span className="text-slate-400">Adopt</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-500/20 border border-blue-400"></div>
+            <span className="text-slate-400">Trial</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-400"></div>
+            <span className="text-slate-400">Assess</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-400"></div>
+            <span className="text-slate-400">Hold</span>
           </div>
         </div>
       </div>
