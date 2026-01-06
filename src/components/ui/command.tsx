@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Command as CommandPrimitive, CommandDialog as CommandDialogPrimitive } from "cmdk";
+import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -25,18 +25,48 @@ type CommandDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
+  label?: string;
 };
 
-function CommandDialog({ open, onOpenChange, children }: CommandDialogProps) {
+function CommandDialog({ open, onOpenChange, children, label }: CommandDialogProps) {
+  React.useEffect(() => {
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onOpenChange(false);
+      }
+    }
+
+    if (open) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "";
+    };
+  }, [open, onOpenChange]);
+
+  if (!open) return null;
+
   return (
-    <CommandDialogPrimitive
-      open={open}
-      onOpenChange={onOpenChange}
-      overlayClassName="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-      contentClassName="fixed left-1/2 top-1/2 z-50 w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-2xl"
-    >
-      {children}
-    </CommandDialogPrimitive>
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+        onClick={() => onOpenChange(false)}
+      />
+
+      {/* Dialog */}
+      <div className="fixed left-1/2 top-1/2 z-50 w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-2xl">
+        {/* Screen reader title */}
+        <div className="sr-only" role="dialog" aria-label={label || "Command Palette"} />
+
+        {children}
+      </div>
+    </>
   );
 }
 

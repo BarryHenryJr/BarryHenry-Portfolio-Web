@@ -23,6 +23,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { useTheme } from "next-themes";
 
 const GITHUB_URL = "https://github.com/TODO";
 const LINKEDIN_URL = "https://www.linkedin.com/in/TODO";
@@ -31,6 +32,7 @@ const EMAIL = "todo@example.com";
 export function CommandMenu() {
   const router = useRouter();
   const [open, setOpen] = React.useState<boolean>(false);
+  const { theme, setTheme } = useTheme();
 
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -63,14 +65,14 @@ export function CommandMenu() {
     await navigator.clipboard.writeText(EMAIL);
   }
 
-  function toggleThemePlaceholder() {
+  function toggleTheme() {
+    setTheme(theme === "dark" ? "light" : "dark");
     setOpen(false);
-    console.log("TODO: Toggle theme");
   }
 
   return (
     <AnimatePresence>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={open} onOpenChange={setOpen} label="Command Palette">
         <motion.div
           initial={{ opacity: 0, scale: 0.98, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -117,7 +119,7 @@ export function CommandMenu() {
                   <Copy className="h-4 w-4 text-slate-500" />
                   <span className="flex-1">Copy Email</span>
                 </CommandItem>
-                <CommandItem onSelect={toggleThemePlaceholder}>
+                <CommandItem onSelect={toggleTheme}>
                   <SunMoon className="h-4 w-4 text-slate-500" />
                   <span className="flex-1">Toggle Theme</span>
                 </CommandItem>
