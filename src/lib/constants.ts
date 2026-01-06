@@ -75,3 +75,40 @@ export const PROJECTS: Project[] = [
   },
   // Add more mock projects as needed
 ];
+export interface ExperienceItem {
+  id: string;
+  company: string;
+  role: string;
+  period: string;
+  version: string; // e.g., "v3.0.0"
+  description: string[];
+  tech: string[];
+}
+
+export const EXPERIENCE: ExperienceItem[] = [
+  {
+    id: "exp-current",
+    company: "Tech Corp Inc.",
+    role: "Senior Product Engineer",
+    period: "2023 - Present",
+    version: "v3.0.0",
+    description: [
+      "Architected the new SaaS billing engine using Stripe and Next.js.",
+      "Reduced build times by 40% by migrating to Turborepo."
+    ],
+    tech: ["Next.js", "TypeScript", "Stripe", "AWS"]
+  },
+  {
+    id: "exp-prev",
+    company: "Startup XYZ",
+    role: "Full Stack Developer",
+    period: "2021 - 2023",
+    version: "v2.0.0",
+    description: [
+      "Employee #3. Built the MVP from scratch.",
+      "Scaled database to handle 100k daily active users."
+    ],
+    tech: ["React", "Node.js", "PostgreSQL", "Redis"]
+  },
+  // Add more history...
+];
