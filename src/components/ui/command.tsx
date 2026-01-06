@@ -29,6 +29,9 @@ type CommandDialogProps = {
 };
 
 function CommandDialog({ open, onOpenChange, children, label }: CommandDialogProps) {
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = React.useRef<Element | null>(null);
+
   React.useEffect(() => {
     function handleEscape(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -36,15 +39,57 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
       }
     }
 
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab" || !dialogRef.current) return;
+
+      const focusableElements = dialogRef.current.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0] as HTMLElement;
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    }
+
     if (open) {
+      // Store the currently focused element
+      previouslyFocusedElementRef.current = document.activeElement;
+
+      // Add event listeners
       document.addEventListener("keydown", handleEscape);
+      document.addEventListener("keydown", handleTab);
       document.body.style.overflow = "hidden";
+
+      // Focus the first focusable element (usually the input)
+      setTimeout(() => {
+        const firstFocusable = dialogRef.current?.querySelector(
+          'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) as HTMLElement;
+        firstFocusable?.focus();
+      }, 100);
     } else {
+      // Restore focus to the previously focused element
+      if (previouslyFocusedElementRef.current instanceof HTMLElement) {
+        previouslyFocusedElementRef.current.focus();
+      }
       document.body.style.overflow = "";
     }
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("keydown", handleTab);
       document.body.style.overflow = "";
     };
   }, [open, onOpenChange]);
@@ -56,14 +101,24 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+        role="presentation"
+        tabIndex={-1}
         onClick={() => onOpenChange(false)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onOpenChange(false);
+          }
+        }}
       />
 
       {/* Dialog */}
-      <div className="fixed left-1/2 top-1/2 z-50 w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-border bg-background shadow-2xl">
-        {/* Screen reader title */}
-        <div className="sr-only" role="dialog" aria-label={label || "Command Palette"} />
-
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-label={label || "Command Palette"}
+        className="fixed left-1/2 top-1/2 z-50 w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-border bg-background shadow-2xl"
+      >
         {children}
       </div>
     </>

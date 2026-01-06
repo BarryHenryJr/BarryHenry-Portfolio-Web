@@ -62,7 +62,15 @@ export function CommandMenu() {
 
   async function copyEmail() {
     setOpen(false);
-    await navigator.clipboard.writeText(EMAIL);
+
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+    } catch (error) {
+      console.error('Failed to copy email to clipboard:', error);
+
+      // Fallback: show alert with email for manual copying
+      alert(`Unable to copy email automatically. Please copy manually: ${EMAIL}`);
+    }
   }
 
   function toggleTheme() {
@@ -72,68 +80,70 @@ export function CommandMenu() {
   }
 
   return (
-    <AnimatePresence>
-      <CommandDialog open={open} onOpenChange={setOpen} label="Command Palette">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.98, y: 8 }}
-          transition={{ duration: 0.14, ease: "easeOut" }}
-        >
-          <Command className="bg-popover text-popover-foreground border-border">
-            <CommandInput placeholder="Search pages and actions…" />
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
+    <CommandDialog open={open} onOpenChange={setOpen} label="Command Palette">
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 8 }}
+            transition={{ duration: 0.14, ease: "easeOut" }}
+          >
+            <Command className="bg-popover text-popover-foreground border-border">
+              <CommandInput placeholder="Search pages and actions…" />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
 
-              <CommandGroup heading="Pages">
-                {NAVIGATION_ITEMS.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <CommandItem key={item.id} onSelect={() => goToPage(item)}>
-                      <Icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="flex-1">{item.label}</span>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                    </CommandItem>
-                  );
-                })}
-              </CommandGroup>
+                <CommandGroup heading="Pages">
+                  {NAVIGATION_ITEMS.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <CommandItem key={item.id} onSelect={() => goToPage(item)}>
+                        <Icon className="h-4 w-4 text-muted-foreground" />
+                        <span className="flex-1">{item.label}</span>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
 
-              <CommandSeparator />
+                <CommandSeparator />
 
-              <CommandGroup heading="Social">
-                <CommandItem onSelect={() => openExternal(GITHUB_URL)}>
-                  <Github className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">GitHub</span>
-                  <CommandShortcut>↗</CommandShortcut>
-                </CommandItem>
-                <CommandItem onSelect={() => openExternal(LINKEDIN_URL)}>
-                  <Linkedin className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">LinkedIn</span>
-                  <CommandShortcut>↗</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
+                <CommandGroup heading="Social">
+                  <CommandItem onSelect={() => openExternal(GITHUB_URL)}>
+                    <Github className="h-4 w-4 text-muted-foreground" />
+                    <span className="flex-1">GitHub</span>
+                    <CommandShortcut>↗</CommandShortcut>
+                  </CommandItem>
+                  <CommandItem onSelect={() => openExternal(LINKEDIN_URL)}>
+                    <Linkedin className="h-4 w-4 text-muted-foreground" />
+                    <span className="flex-1">LinkedIn</span>
+                    <CommandShortcut>↗</CommandShortcut>
+                  </CommandItem>
+                </CommandGroup>
 
-              <CommandSeparator />
+                <CommandSeparator />
 
-              <CommandGroup heading="General">
-                <CommandItem onSelect={() => void copyEmail()}>
-                  <Copy className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">Copy Email</span>
-                </CommandItem>
-                <CommandItem onSelect={toggleTheme}>
-                  <SunMoon className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">Toggle Theme</span>
-                </CommandItem>
-              </CommandGroup>
-            </CommandList>
+                <CommandGroup heading="General">
+                  <CommandItem onSelect={() => void copyEmail()}>
+                    <Copy className="h-4 w-4 text-muted-foreground" />
+                    <span className="flex-1">Copy Email</span>
+                  </CommandItem>
+                  <CommandItem onSelect={toggleTheme}>
+                    <SunMoon className="h-4 w-4 text-muted-foreground" />
+                    <span className="flex-1">Toggle Theme</span>
+                  </CommandItem>
+                </CommandGroup>
+              </CommandList>
 
-            <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
-              <span>Tip: Press Esc to close</span>
-              <span className="rounded-md border border-border bg-muted px-2 py-1">⌘K / CtrlK</span>
-            </div>
-          </Command>
-        </motion.div>
-      </CommandDialog>
-    </AnimatePresence>
+              <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
+                <span>Tip: Press Esc to close</span>
+                <span className="rounded-md border border-border bg-muted px-2 py-1">⌘K / Ctrl+K</span>
+              </div>
+            </Command>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </CommandDialog>
   );
 }

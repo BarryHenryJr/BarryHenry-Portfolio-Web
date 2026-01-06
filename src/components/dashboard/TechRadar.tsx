@@ -29,10 +29,10 @@ const techItems: TechItem[] = [
 
 const getRingColor = (ring: TechItem['ring']) => {
   switch (ring) {
-    case 'adopt': return 'text-green-400 bg-green-500/20';
-    case 'trial': return 'text-blue-400 bg-blue-500/20';
-    case 'assess': return 'text-yellow-400 bg-yellow-500/20';
-    case 'hold': return 'text-red-400 bg-red-500/20';
+    case 'adopt': return '#22c55e'; // green-500
+    case 'trial': return '#3b82f6'; // blue-500
+    case 'assess': return '#eab308'; // yellow-500
+    case 'hold': return '#ef4444'; // red-500
   }
 };
 
@@ -59,6 +59,8 @@ export function TechRadar() {
           viewBox="0 0 200 200"
           className="w-full h-full"
           style={{ filter: 'drop-shadow(0 0 10px rgba(51, 65, 85, 0.3))' }}
+          role="img"
+          aria-label="Technology radar visualization showing technology adoption status across languages, platforms, tools, and techniques categories"
         >
           {/* Background */}
           <rect width="200" height="200" fill="transparent" />
@@ -74,16 +76,16 @@ export function TechRadar() {
           <line x1="10" y1="100" x2="190" y2="100" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.5" />
 
           {/* Ring labels */}
-          <text x="100" y="35" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">ADOPT</text>
-          <text x="100" y="60" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">TRIAL</text>
-          <text x="100" y="85" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">ASSESS</text>
-          <text x="100" y="105" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">HOLD</text>
+          <text x="100" y="35" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">ADOPT</text>
+          <text x="100" y="60" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">TRIAL</text>
+          <text x="100" y="85" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">ASSESS</text>
+          <text x="100" y="105" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">HOLD</text>
 
           {/* Quadrant labels */}
-          <text x="150" y="45" textAnchor="middle" className="fill-foreground text-xs font-semibold">LANGUAGES</text>
-          <text x="50" y="45" textAnchor="middle" className="fill-foreground text-xs font-semibold">PLATFORMS</text>
-          <text x="50" y="155" textAnchor="middle" className="fill-foreground text-xs font-semibold">TOOLS</text>
-          <text x="150" y="155" textAnchor="middle" className="fill-foreground text-xs font-semibold">TECHNIQUES</text>
+          <text x="150" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">LANGUAGES</text>
+          <text x="50" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">PLATFORMS</text>
+          <text x="50" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">TOOLS</text>
+          <text x="150" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">TECHNIQUES</text>
 
           {/* Technology items */}
           {techItems.map((item) => {
@@ -100,14 +102,17 @@ export function TechRadar() {
                   cx={x}
                   cy={y}
                   r="4"
-                  className={`fill-current ${getRingColor(item.ring)}`}
-                  style={{ filter: 'drop-shadow(0 0 4px currentColor)' }}
+                  fill={getRingColor(item.ring)}
+                  style={{ filter: `drop-shadow(0 0 4px ${getRingColor(item.ring)})` }}
                 />
                 <text
                   x={x}
                   y={y - 8}
                   textAnchor="middle"
-                  className="fill-foreground text-xs font-medium pointer-events-none"
+                  fill="hsl(var(--foreground))"
+                  fontSize="12"
+                  fontWeight="500"
+                  style={{ pointerEvents: 'none' }}
                 >
                   {item.name}
                 </text>
