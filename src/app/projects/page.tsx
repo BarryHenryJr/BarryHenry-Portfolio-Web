@@ -37,12 +37,12 @@ export default function ProjectsPage() {
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 space-y-4">
+              <CardContent className="flex-1 flex flex-col gap-4">
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {project.description}
                 </p>
 
-                <div className="space-y-3">
+                <div className="mt-auto space-y-3">
                   {/* Tech Stack Badges */}
                   <div className="flex flex-wrap gap-1">
                     {project.tech.map((tech) => (
