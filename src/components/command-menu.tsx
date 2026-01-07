@@ -66,7 +66,7 @@ export function CommandMenu() {
 
     try {
       await navigator.clipboard.writeText(EMAIL);
-    } catch (error) {
+    } catch {
       // Show user-friendly error message
       setCopyError(EMAIL);
       setTimeout(() => setCopyError(null), 5000); // Clear after 5 seconds

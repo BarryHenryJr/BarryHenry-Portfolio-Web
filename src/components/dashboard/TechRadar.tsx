@@ -111,7 +111,6 @@ export function TechRadar() {
                   tabIndex={0}
                   role="img"
                   aria-label={ariaLabel}
-                  title={`${item.name} (${ringLabel})`}
                 />
                 <text
                   x={x}
