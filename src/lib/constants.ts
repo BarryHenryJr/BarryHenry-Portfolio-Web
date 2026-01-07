@@ -115,6 +115,166 @@ export const EXPERIENCE: ExperienceItem[] = [
   // Add more history...
 ];
 
+export type StackCategory = "Frontend" | "Backend" | "DevOps" | "Design" | "Tools";
+export type StackProficiency = "Expert" | "Advanced" | "Intermediate";
+
+export interface StackItem {
+  id: string;
+  name: string;
+  category: StackCategory;
+  proficiency: StackProficiency;
+  years: number;
+  icon: string; // Lucide icon name
+  description: string;
+}
+
+export const STACK: StackItem[] = [
+  // Frontend
+  {
+    id: "nextjs",
+    name: "Next.js",
+    category: "Frontend",
+    proficiency: "Expert",
+    years: 4,
+    icon: "Layers",
+    description: "App Router, Server Actions, React Server Components"
+  },
+  {
+    id: "typescript",
+    name: "TypeScript",
+    category: "Frontend",
+    proficiency: "Expert",
+    years: 5,
+    icon: "FileCode",
+    description: "Strict typing, generics, utility types"
+  },
+  {
+    id: "react",
+    name: "React",
+    category: "Frontend",
+    proficiency: "Expert",
+    years: 5,
+    icon: "Atom",
+    description: "Hooks, Context, component lifecycle"
+  },
+  {
+    id: "tailwind",
+    name: "Tailwind CSS",
+    category: "Frontend",
+    proficiency: "Expert",
+    years: 3,
+    icon: "Palette",
+    description: "Utility-first, responsive design"
+  },
+
+  // Backend
+  {
+    id: "nodejs",
+    name: "Node.js",
+    category: "Backend",
+    proficiency: "Advanced",
+    years: 4,
+    icon: "Server",
+    description: "Express, APIs, server-side logic"
+  },
+  {
+    id: "postgres",
+    name: "PostgreSQL",
+    category: "Backend",
+    proficiency: "Advanced",
+    years: 3,
+    icon: "Database",
+    description: "Complex queries, indexing, Supabase/Prisma"
+  },
+  {
+    id: "mongodb",
+    name: "MongoDB",
+    category: "Backend",
+    proficiency: "Intermediate",
+    years: 2,
+    icon: "Database",
+    description: "NoSQL document storage, aggregation"
+  },
+
+  // DevOps
+  {
+    id: "vercel",
+    name: "Vercel",
+    category: "DevOps",
+    proficiency: "Expert",
+    years: 3,
+    icon: "Cloud",
+    description: "Deployment, edge functions, analytics"
+  },
+  {
+    id: "aws",
+    name: "AWS",
+    category: "DevOps",
+    proficiency: "Advanced",
+    years: 2,
+    icon: "Cloud",
+    description: "EC2, S3, Lambda, CloudFormation"
+  },
+  {
+    id: "docker",
+    name: "Docker",
+    category: "DevOps",
+    proficiency: "Intermediate",
+    years: 2,
+    icon: "Container",
+    description: "Containerization, Docker Compose"
+  },
+
+  // Design
+  {
+    id: "figma",
+    name: "Figma",
+    category: "Design",
+    proficiency: "Advanced",
+    years: 3,
+    icon: "PenTool",
+    description: "UI/UX design, prototyping, collaboration"
+  },
+  {
+    id: "photoshop",
+    name: "Photoshop",
+    category: "Design",
+    proficiency: "Intermediate",
+    years: 4,
+    icon: "Image",
+    description: "Image editing, digital art"
+  },
+
+  // Tools
+  {
+    id: "git",
+    name: "Git",
+    category: "Tools",
+    proficiency: "Expert",
+    years: 6,
+    icon: "GitBranch",
+    description: "Version control, branching strategies"
+  },
+  {
+    id: "vscode",
+    name: "VS Code",
+    category: "Tools",
+    proficiency: "Expert",
+    years: 5,
+    icon: "Code",
+    description: "Extensions, debugging, productivity"
+  },
+  {
+    id: "postman",
+    name: "Postman",
+    category: "Tools",
+    proficiency: "Advanced",
+    years: 4,
+    icon: "Send",
+    description: "API testing, documentation"
+  }
+];
+
 // Social and contact information
 export const GITHUB_URL = "https://github.com/barryhenryjr";
 export const LINKEDIN_URL = "https://linkedin.com/in/barrynhenry";
