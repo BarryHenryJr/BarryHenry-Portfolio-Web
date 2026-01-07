@@ -12,6 +12,30 @@ const PROJECT_ICONS = {
   BarChart3,
 } as const;
 
+interface ProjectLinkButtonProps {
+  href: string;
+  variant?: "default" | "ghost";
+  children: React.ReactNode;
+}
+
+function ProjectLinkButton({ href, variant = "default", children }: ProjectLinkButtonProps) {
+  if (href !== "#") {
+    return (
+      <Button size="sm" variant={variant} className="flex-1" asChild>
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          {children}
+        </a>
+      </Button>
+    );
+  }
+
+  return (
+    <Button size="sm" variant={variant} className="flex-1" disabled tabIndex={-1}>
+      {children}
+    </Button>
+  );
+}
+
 export default function ProjectsPage() {
   return (
     <div className="space-y-8">
@@ -59,44 +83,15 @@ export default function ProjectsPage() {
 
                   {/* Action Buttons */}
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      className="flex-1"
-                      asChild
-                    >
-                      <a
-                        href={project.href === "#" ? undefined : project.href}
-                        target={project.href === "#" ? undefined : "_blank"}
-                        rel={project.href === "#" ? undefined : "noopener noreferrer"}
-                        aria-disabled={project.href === "#"}
-                        className={`inline-flex items-center gap-2 ${
-                          project.href === "#" ? "pointer-events-none opacity-50" : ""
-                        }`}
-                      >
-                        Install
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </Button>
+                    <ProjectLinkButton href={project.href}>
+                      Install
+                      <ExternalLink className="h-3 w-3" />
+                    </ProjectLinkButton>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="flex-1"
-                      asChild
-                    >
-                      <a
-                        href={project.repo === "#" ? undefined : project.repo}
-                        target={project.repo === "#" ? undefined : "_blank"}
-                        rel={project.repo === "#" ? undefined : "noopener noreferrer"}
-                        aria-disabled={project.repo === "#"}
-                        className={`inline-flex items-center gap-2 ${
-                          project.repo === "#" ? "pointer-events-none opacity-50" : ""
-                        }`}
-                      >
-                        <Github className="h-3 w-3" />
-                        View Source
-                      </a>
-                    </Button>
+                    <ProjectLinkButton href={project.repo} variant="ghost">
+                      <Github className="h-3 w-3" />
+                      View Source
+                    </ProjectLinkButton>
                   </div>
                 </div>
               </CardContent>

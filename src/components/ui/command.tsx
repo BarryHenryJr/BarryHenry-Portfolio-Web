@@ -112,14 +112,7 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-        role="presentation"
         onClick={() => onOpenChange(false)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onOpenChange(false);
-          }
-        }}
       />
 
       {/* Dialog */}

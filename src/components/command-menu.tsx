@@ -25,13 +25,14 @@ import {
 } from "@/components/ui/command";
 import { useTheme } from "next-themes";
 
-const GITHUB_URL = "https://github.com/TODO";
-const LINKEDIN_URL = "https://www.linkedin.com/in/TODO";
+const GITHUB_URL = "https://github.com/barryhenryjr";
+const LINKEDIN_URL = "https://linkedin.com/in/barrynhenry";
 const EMAIL = "todo@example.com";
 
 export function CommandMenu() {
   const router = useRouter();
   const [open, setOpen] = React.useState<boolean>(false);
+  const [copyError, setCopyError] = React.useState<string | null>(null);
   const { theme, setTheme } = useTheme();
 
   React.useEffect(() => {
@@ -66,10 +67,9 @@ export function CommandMenu() {
     try {
       await navigator.clipboard.writeText(EMAIL);
     } catch (error) {
-      console.error('Failed to copy email to clipboard:', error);
-
-      // Fallback: show alert with email for manual copying
-      alert(`Unable to copy email automatically. Please copy manually: ${EMAIL}`);
+      // Show user-friendly error message
+      setCopyError(EMAIL);
+      setTimeout(() => setCopyError(null), 5000); // Clear after 5 seconds
     }
   }
 
@@ -135,6 +135,17 @@ export function CommandMenu() {
                   </CommandItem>
                 </CommandGroup>
               </CommandList>
+
+              {copyError && (
+                <div className="border-t border-border bg-muted/50 px-4 py-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Copy className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">
+                      Copy failed. Email: <span className="font-mono text-foreground select-all">{copyError}</span>
+                    </span>
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
                 <span>Tip: Press Esc to close</span>

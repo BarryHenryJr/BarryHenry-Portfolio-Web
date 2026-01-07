@@ -29,10 +29,10 @@ const techItems: TechItem[] = [
 
 const getRingColor = (ring: TechItem['ring']) => {
   switch (ring) {
-    case 'adopt': return '#22c55e'; // green-500
-    case 'trial': return '#3b82f6'; // blue-500
-    case 'assess': return '#eab308'; // yellow-500
-    case 'hold': return '#ef4444'; // red-500
+    case 'adopt': return 'hsl(var(--chart-1))';
+    case 'trial': return 'hsl(var(--chart-2))';
+    case 'assess': return 'hsl(var(--chart-3))';
+    case 'hold': return 'hsl(var(--chart-4))';
   }
 };
 
@@ -62,18 +62,19 @@ export function TechRadar() {
           role="img"
           aria-label="Technology radar visualization showing technology adoption status across languages, platforms, tools, and techniques categories"
         >
+          <title>Technology Radar: Interactive visualization of technology adoption across languages, platforms, tools, and techniques</title>
           {/* Background */}
           <rect width="200" height="200" fill="transparent" />
 
           {/* Concentric rings */}
-          <circle cx="100" cy="100" r="90" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
-          <circle cx="100" cy="100" r="75" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
-          <circle cx="100" cy="100" r="50" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
-          <circle cx="100" cy="100" r="25" fill="none" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.3" />
+          <circle cx="100" cy="100" r="90" fill="none" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.3" />
+          <circle cx="100" cy="100" r="75" fill="none" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.3" />
+          <circle cx="100" cy="100" r="50" fill="none" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.3" />
+          <circle cx="100" cy="100" r="25" fill="none" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.3" />
 
           {/* Quadrant lines */}
-          <line x1="100" y1="10" x2="100" y2="190" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.5" />
-          <line x1="10" y1="100" x2="190" y2="100" stroke="rgb(51, 65, 85)" strokeWidth="1" opacity="0.5" />
+          <line x1="100" y1="10" x2="100" y2="190" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.5" />
+          <line x1="10" y1="100" x2="190" y2="100" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.5" />
 
           {/* Ring labels */}
           <text x="100" y="35" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">ADOPT</text>
@@ -96,6 +97,9 @@ export function TechRadar() {
             const x = 100 + Math.cos(angle) * normalizedDistance;
             const y = 100 + Math.sin(angle) * normalizedDistance;
 
+            const ringLabel = item.ring.charAt(0).toUpperCase() + item.ring.slice(1);
+            const ariaLabel = `${item.name}: ${ringLabel} - ${item.quadrant.charAt(0).toUpperCase() + item.quadrant.slice(1)} quadrant`;
+
             return (
               <g key={item.name}>
                 <circle
@@ -104,6 +108,10 @@ export function TechRadar() {
                   r="4"
                   fill={getRingColor(item.ring)}
                   style={{ filter: `drop-shadow(0 0 4px ${getRingColor(item.ring)})` }}
+                  tabIndex={0}
+                  role="img"
+                  aria-label={ariaLabel}
+                  title={`${item.name} (${ringLabel})`}
                 />
                 <text
                   x={x}
