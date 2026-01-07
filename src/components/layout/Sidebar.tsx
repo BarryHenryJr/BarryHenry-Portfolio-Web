@@ -14,11 +14,11 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className={cn("fixed left-0 top-0 z-50 h-full w-64 bg-slate-950 border-r border-slate-800", className)}>
+    <aside className={cn("fixed left-0 top-0 z-50 h-full w-64 bg-background border-r border-border", className)}>
       <div className="flex h-full flex-col">
         {/* Logo/Brand */}
-        <div className="flex h-16 items-center border-b border-slate-800 px-6">
-          <h1 className="text-xl font-semibold text-slate-100">Portfolio</h1>
+        <div className="flex h-16 items-center border-b border-border px-6">
+          <h1 className="text-xl font-semibold text-foreground">Portfolio</h1>
         </div>
 
         {/* Navigation */}
@@ -34,8 +34,8 @@ export function Sidebar({ className }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
-                    : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                    ? "bg-accent text-accent-foreground border border-accent"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -46,8 +46,8 @@ export function Sidebar({ className }: SidebarProps) {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-slate-800 p-4">
-          <div className="text-xs text-slate-500">
+        <div className="border-t border-border p-4">
+          <div className="text-xs text-muted-foreground">
             v1.0.0
           </div>
         </div>

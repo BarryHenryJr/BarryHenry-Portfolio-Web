@@ -10,7 +10,7 @@ interface ShellProps {
 
 export function Shell({ children, className }: ShellProps) {
   return (
-    <div className={cn("min-h-screen bg-slate-950", className)}>
+    <div className={cn("min-h-screen bg-background", className)}>
       {/* Sidebar - Fixed left */}
       <Sidebar />
 
