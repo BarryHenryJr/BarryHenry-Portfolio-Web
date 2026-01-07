@@ -118,13 +118,30 @@ export const EXPERIENCE: ExperienceItem[] = [
 export type StackCategory = "Frontend" | "Backend" | "DevOps" | "Design" | "Tools";
 export type StackProficiency = "Expert" | "Advanced" | "Intermediate";
 
+// A type for the supported Lucide icon names, to ensure type safety.
+export type StackIconName =
+  | "Layers"
+  | "FileCode"
+  | "Atom"
+  | "Palette"
+  | "Server"
+  | "Database"
+  | "Cloud"
+  | "Container"
+  | "PenTool"
+  | "Image"
+  | "GitBranch"
+  | "Code"
+  | "Send"
+  | "Package";
+
 export interface StackItem {
   id: string;
   name: string;
   category: StackCategory;
   proficiency: StackProficiency;
   years: number;
-  icon: string; // Lucide icon name
+  icon: StackIconName; // Lucide icon name
   description: string;
 }
 

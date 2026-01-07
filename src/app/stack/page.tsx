@@ -1,29 +1,28 @@
 import React from "react";
-import { STACK, StackCategory } from "@/lib/constants";
+import { STACK, StackCategory, StackItem } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StackGrid } from "./components/StackGrid";
 
 // Define category order for consistent rendering
 const CATEGORY_ORDER: StackCategory[] = ["Frontend", "Backend", "DevOps", "Design", "Tools"];
 
+// Pre-compute grouped stack data at module level since STACK and CATEGORY_ORDER are constants
+const groupedStack = STACK.reduce((acc, item) => {
+  if (!acc[item.category]) {
+    acc[item.category] = [];
+  }
+  acc[item.category]!.push(item);
+  return acc;
+}, {} as Partial<Record<StackCategory, StackItem[]>>);
+
+const stackGroups = CATEGORY_ORDER
+  .filter(category => groupedStack[category] && groupedStack[category]!.length > 0)
+  .map(category => ({
+    category,
+    items: groupedStack[category]!
+  }));
+
 export default function StackPage() {
-  // Group STACK items by category
-  const groupedStack = STACK.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<StackCategory, typeof STACK>);
-
-  // Convert to array format expected by StackGrid, maintaining category order
-  const stackGroups = CATEGORY_ORDER
-    .filter(category => groupedStack[category] && groupedStack[category].length > 0)
-    .map(category => ({
-      category,
-      items: groupedStack[category]
-    }));
-
   return (
     <div className="space-y-8">
       {/* Page Header */}

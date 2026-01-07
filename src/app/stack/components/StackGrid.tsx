@@ -20,10 +20,10 @@ import {
   Send,
   Package
 } from "lucide-react";
-import { StackItem, StackCategory } from "@/lib/constants";
+import { StackItem, StackCategory, StackIconName } from "@/lib/constants";
 
 // Type-safe mapping of valid stack icon names to components
-const STACK_ICONS = {
+const STACK_ICONS: Record<StackIconName, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   Layers,
   FileCode,
   Atom,
@@ -37,6 +37,7 @@ const STACK_ICONS = {
   GitBranch,
   Code,
   Send,
+  Package,
 } as const;
 
 interface StackGroup {
@@ -85,8 +86,8 @@ interface StackCardProps {
 }
 
 function StackCard({ item }: StackCardProps) {
-  // Type-safe icon lookup with fallback
-  const IconComponent = STACK_ICONS[item.icon as keyof typeof STACK_ICONS] || Package;
+  // Type-safe icon lookup - Package is now part of the official mapping
+  const IconComponent = STACK_ICONS[item.icon];
 
   return (
     <Card className="p-4 h-full">
