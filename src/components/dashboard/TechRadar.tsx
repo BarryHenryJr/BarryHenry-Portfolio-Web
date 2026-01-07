@@ -45,6 +45,26 @@ const getRingRadius = (ring: TechItem['ring']) => {
   }
 };
 
+// Legend item styles - extracted to constants to prevent unnecessary re-renders
+const LEGEND_STYLES = {
+  adopt: {
+    backgroundColor: 'hsl(var(--chart-1))',
+    borderColor: 'hsl(var(--chart-1))',
+  },
+  trial: {
+    backgroundColor: 'hsl(var(--chart-2))',
+    borderColor: 'hsl(var(--chart-2))',
+  },
+  assess: {
+    backgroundColor: 'hsl(var(--chart-3))',
+    borderColor: 'hsl(var(--chart-3))',
+  },
+  hold: {
+    backgroundColor: 'hsl(var(--chart-4))',
+    borderColor: 'hsl(var(--chart-4))',
+  },
+} as const;
+
 export function TechRadar() {
   return (
     <div className="rounded-lg border border-border bg-card p-6">
@@ -77,16 +97,16 @@ export function TechRadar() {
           <line x1="10" y1="100" x2="190" y2="100" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.5" />
 
           {/* Ring labels */}
-          <text x="100" y="35" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">ADOPT</text>
-          <text x="100" y="60" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">TRIAL</text>
-          <text x="100" y="85" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">ASSESS</text>
-          <text x="100" y="105" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">HOLD</text>
+          <text x="100" y="35" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">ADOPT</text>
+          <text x="100" y="60" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">TRIAL</text>
+          <text x="100" y="85" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">ASSESS</text>
+          <text x="100" y="105" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">HOLD</text>
 
           {/* Quadrant labels */}
-          <text x="150" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">LANGUAGES</text>
-          <text x="50" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">PLATFORMS</text>
-          <text x="50" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">TOOLS</text>
-          <text x="150" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">TECHNIQUES</text>
+          <text x="150" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">LANGUAGES</text>
+          <text x="50" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">PLATFORMS</text>
+          <text x="50" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">TOOLS</text>
+          <text x="150" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">TECHNIQUES</text>
 
           {/* Technology items */}
           {techItems.map((item) => {
@@ -114,6 +134,7 @@ export function TechRadar() {
                   fill="hsl(var(--foreground))"
                   fontSize="12"
                   fontWeight="500"
+                  role="text"
                   style={{ pointerEvents: 'none' }}
                 >
                   {item.name}
@@ -124,44 +145,36 @@ export function TechRadar() {
         </svg>
 
         {/* Legend */}
-        <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-          <div className="flex items-center gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-2 text-xs" role="list" aria-label="Technology adoption status legend">
+          <div className="flex items-center gap-2" role="listitem">
             <div
               className="w-3 h-3 rounded-full opacity-80 border"
-              style={{
-                backgroundColor: 'hsl(var(--chart-1))',
-                borderColor: 'hsl(var(--chart-1))'
-              }}
+              style={LEGEND_STYLES.adopt}
+              aria-hidden="true"
             ></div>
             <span className="text-muted-foreground">Adopt</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" role="listitem">
             <div
               className="w-3 h-3 rounded-full opacity-80 border"
-              style={{
-                backgroundColor: 'hsl(var(--chart-2))',
-                borderColor: 'hsl(var(--chart-2))'
-              }}
+              style={LEGEND_STYLES.trial}
+              aria-hidden="true"
             ></div>
             <span className="text-muted-foreground">Trial</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" role="listitem">
             <div
               className="w-3 h-3 rounded-full opacity-80 border"
-              style={{
-                backgroundColor: 'hsl(var(--chart-3))',
-                borderColor: 'hsl(var(--chart-3))'
-              }}
+              style={LEGEND_STYLES.assess}
+              aria-hidden="true"
             ></div>
             <span className="text-muted-foreground">Assess</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" role="listitem">
             <div
               className="w-3 h-3 rounded-full opacity-80 border"
-              style={{
-                backgroundColor: 'hsl(var(--chart-4))',
-                borderColor: 'hsl(var(--chart-4))'
-              }}
+              style={LEGEND_STYLES.hold}
+              aria-hidden="true"
             ></div>
             <span className="text-muted-foreground">Hold</span>
           </div>

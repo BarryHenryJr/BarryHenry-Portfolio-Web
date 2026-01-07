@@ -68,7 +68,7 @@ export function CommandMenu() {
       await navigator.clipboard.writeText(EMAIL);
     } catch (error) {
       // Determine specific error message based on error type
-      let userMessage = "Copy failed";
+      let userMessage = "Failed to copy email to clipboard";
 
       if (error instanceof Error) {
         // Log error for debugging (only in development)
@@ -84,7 +84,7 @@ export function CommandMenu() {
         } else if (error.name === 'SecurityError') {
           userMessage = "Cannot copy from insecure context";
         } else {
-          userMessage = "Copy failed";
+          userMessage = "Failed to copy email to clipboard";
         }
       }
 

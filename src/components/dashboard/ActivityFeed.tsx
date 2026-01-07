@@ -10,7 +10,13 @@ export function ActivityFeed() {
 
       <div className="space-y-3">
         <div className="flex items-center gap-3 p-3 rounded-md bg-muted/50 border border-border">
-          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+          <div
+            className="h-2 w-2 rounded-full bg-green-500"
+            role="img"
+            aria-label="Active status"
+          >
+            <span className="sr-only">Active</span>
+          </div>
           <div className="flex-1">
             <p className="text-sm text-card-foreground">Portfolio updated</p>
             <p className="text-xs text-muted-foreground">2 hours ago</p>
@@ -18,7 +24,13 @@ export function ActivityFeed() {
         </div>
 
         <div className="flex items-center gap-3 p-3 rounded-md bg-muted/50 border border-border">
-          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+          <div
+            className="h-2 w-2 rounded-full bg-blue-500"
+            role="img"
+            aria-label="Deployed status"
+          >
+            <span className="sr-only">Deployed</span>
+          </div>
           <div className="flex-1">
             <p className="text-sm text-card-foreground">New project deployed</p>
             <p className="text-xs text-muted-foreground">1 day ago</p>
@@ -26,7 +38,13 @@ export function ActivityFeed() {
         </div>
 
         <div className="flex items-center gap-3 p-3 rounded-md bg-muted/50 border border-border">
-          <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
+          <div
+            className="h-2 w-2 rounded-full bg-yellow-500"
+            role="img"
+            aria-label="Completed status"
+          >
+            <span className="sr-only">Completed</span>
+          </div>
           <div className="flex-1">
             <p className="text-sm text-card-foreground">Skill assessment completed</p>
             <p className="text-xs text-muted-foreground">3 days ago</p>

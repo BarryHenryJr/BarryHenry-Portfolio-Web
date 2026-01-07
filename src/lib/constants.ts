@@ -47,7 +47,7 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  icon: ProjectIcon; // Lucide icon component name
+  icon: ProjectIcon; // String identifier for the Lucide icon component to display
   status: "live" | "beta" | "archived";
   tech: string[];
   href: string;

@@ -32,8 +32,8 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = React.useRef<Element | null>(null);
 
-  React.useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
+  const handleKeyDown = React.useCallback(
+    (e: KeyboardEvent) => {
       // Handle Escape key
       if (e.key === "Escape") {
         onOpenChange(false);
@@ -62,7 +62,11 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
           }
         }
       }
-    }
+    },
+    [onOpenChange]
+  );
+
+  React.useEffect(() => {
 
     if (open) {
       // Store the currently focused element
@@ -100,7 +104,27 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [open, onOpenChange]);
+  }, [open, handleKeyDown]);
+
+  const handleBackdropActivation = React.useCallback(
+    (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
+      // Only close if clicking the backdrop directly, not if clicking through to a child
+      if (e.target === e.currentTarget) {
+        onOpenChange(false);
+      }
+    },
+    [onOpenChange]
+  );
+
+  const handleBackdropKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onOpenChange(false);
+      }
+    },
+    [onOpenChange]
+  );
 
   if (!open) return null;
 
@@ -108,8 +132,12 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
     <>
       {/* Backdrop */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Close dialog"
         className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-        onClick={() => onOpenChange(false)}
+        onClick={handleBackdropActivation}
+        onKeyDown={handleBackdropKeyDown}
       />
 
       {/* Dialog */}

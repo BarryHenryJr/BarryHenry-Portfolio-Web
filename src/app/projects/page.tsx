@@ -84,8 +84,8 @@ export default function ProjectsPage() {
                   {/* Action Buttons */}
                   <div className="flex gap-2">
                     <ProjectLinkButton href={project.href}>
-                      Install
                       <ExternalLink className="h-3 w-3" />
+                      Install
                     </ProjectLinkButton>
 
                     <ProjectLinkButton href={project.repo} variant="ghost">

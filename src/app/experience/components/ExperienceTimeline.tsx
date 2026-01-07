@@ -41,7 +41,7 @@ export function ExperienceTimeline({ items }: ExperienceTimelineProps) {
       className="relative space-y-8 pb-10"
     >
       {/* Vertical timeline line - positioned at 32px from left on mobile, 48px on desktop */}
-      <div className="absolute left-8 md:left-12 top-0 bottom-0 w-px bg-border" />
+      <div className="absolute left-8 md:left-12 top-0 bottom-0 w-px bg-border" aria-hidden="true" />
 
       {items.map((item) => (
         <motion.div
@@ -50,7 +50,7 @@ export function ExperienceTimeline({ items }: ExperienceTimelineProps) {
           className="relative pl-8 md:pl-12"
         >
           {/* Commit node (dot) - centered on the timeline line */}
-          <div className="absolute -left-1 top-6 h-3 w-3 rounded-full bg-muted-foreground ring-4 ring-background z-10" />
+          <div className="absolute -left-1 top-6 h-3 w-3 rounded-full bg-muted-foreground ring-4 ring-background z-10" aria-hidden="true" />
 
           <Card className="bg-card text-card-foreground">
             <CardHeader className="pb-4">
