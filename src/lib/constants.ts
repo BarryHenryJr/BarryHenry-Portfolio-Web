@@ -41,11 +41,13 @@ export const NAVIGATION_ITEMS = [
 
 export type NavigationItem = typeof NAVIGATION_ITEMS[number];
 
+export type ProjectIcon = "LayoutDashboard" | "BarChart3";
+
 export interface Project {
   id: string;
   title: string;
   description: string;
-  icon: string; // We will use Lucide icon names or emojis for now
+  icon: ProjectIcon; // Lucide icon component name
   status: "live" | "beta" | "archived";
   tech: string[];
   href: string;

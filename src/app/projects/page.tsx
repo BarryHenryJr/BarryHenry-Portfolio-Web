@@ -3,9 +3,14 @@ import { PROJECTS } from "@/lib/constants";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, Package } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+import { ExternalLink, Github, Package, LayoutDashboard, BarChart3 } from "lucide-react";
 import { AnimatedGrid } from "./components/AnimatedGrid";
+
+// Type-safe mapping of valid project icon names to components
+const PROJECT_ICONS = {
+  LayoutDashboard,
+  BarChart3,
+} as const;
 
 export default function ProjectsPage() {
   return (
@@ -21,8 +26,8 @@ export default function ProjectsPage() {
       {/* Projects Grid */}
       <AnimatedGrid>
         {PROJECTS.map((project) => {
-          // Dynamically get the icon component from lucide-react
-          const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[project.icon] || Package;
+          // Type-safe icon lookup with fallback
+          const IconComponent = PROJECT_ICONS[project.icon] || Package;
 
           return (
             <Card key={project.id} className="h-full flex flex-col">
@@ -58,13 +63,15 @@ export default function ProjectsPage() {
                       size="sm"
                       className="flex-1"
                       asChild
-                      disabled={project.href === "#"}
                     >
                       <a
-                        href={project.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2"
+                        href={project.href === "#" ? undefined : project.href}
+                        target={project.href === "#" ? undefined : "_blank"}
+                        rel={project.href === "#" ? undefined : "noopener noreferrer"}
+                        aria-disabled={project.href === "#"}
+                        className={`inline-flex items-center gap-2 ${
+                          project.href === "#" ? "pointer-events-none opacity-50" : ""
+                        }`}
                       >
                         Install
                         <ExternalLink className="h-3 w-3" />
@@ -76,13 +83,15 @@ export default function ProjectsPage() {
                       size="sm"
                       className="flex-1"
                       asChild
-                      disabled={project.repo === "#"}
                     >
                       <a
-                        href={project.repo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2"
+                        href={project.repo === "#" ? undefined : project.repo}
+                        target={project.repo === "#" ? undefined : "_blank"}
+                        rel={project.repo === "#" ? undefined : "noopener noreferrer"}
+                        aria-disabled={project.repo === "#"}
+                        className={`inline-flex items-center gap-2 ${
+                          project.repo === "#" ? "pointer-events-none opacity-50" : ""
+                        }`}
                       >
                         <Github className="h-3 w-3" />
                         View Source

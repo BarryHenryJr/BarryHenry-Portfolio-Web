@@ -33,15 +33,21 @@ export function AnimatedGrid({ children }: AnimatedGridProps) {
       animate="visible"
       className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
     >
-      {React.Children.map(children, (child, index) => (
-        <motion.div
-          key={index}
-          variants={itemVariants}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-        >
-          {child}
-        </motion.div>
-      ))}
+      {React.Children.map(children, (child, index) => {
+        // Extract stable key from child element if available, fallback to index
+        const childKey = React.isValidElement(child) ? child.key : index;
+        const stableKey = childKey !== null ? childKey : `animated-item-${index}`;
+
+        return (
+          <motion.div
+            key={stableKey}
+            variants={itemVariants}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            {child}
+          </motion.div>
+        );
+      })}
     </motion.div>
   );
 }

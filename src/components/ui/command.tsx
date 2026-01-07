@@ -73,12 +73,23 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
       document.body.style.overflow = "hidden";
 
       // Focus the first focusable element (usually the input)
-      setTimeout(() => {
+      // Use requestAnimationFrame for more reliable timing
+      requestAnimationFrame(() => {
         const firstFocusable = dialogRef.current?.querySelector(
           'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'
         ) as HTMLElement;
-        firstFocusable?.focus();
-      }, 100);
+        if (firstFocusable) {
+          firstFocusable.focus();
+        } else {
+          // Fallback timeout if element isn't immediately available
+          setTimeout(() => {
+            const fallbackFocusable = dialogRef.current?.querySelector(
+              'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'
+            ) as HTMLElement;
+            fallbackFocusable?.focus();
+          }, 10);
+        }
+      });
     } else {
       // Restore focus to the previously focused element
       if (previouslyFocusedElementRef.current instanceof HTMLElement) {
@@ -102,7 +113,6 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
       <div
         className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
         role="presentation"
-        tabIndex={-1}
         onClick={() => onOpenChange(false)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -231,3 +241,4 @@ export {
   CommandSeparator,
   CommandShortcut,
 };
+

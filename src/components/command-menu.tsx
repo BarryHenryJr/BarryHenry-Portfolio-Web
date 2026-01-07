@@ -125,7 +125,7 @@ export function CommandMenu() {
                 <CommandSeparator />
 
                 <CommandGroup heading="General">
-                  <CommandItem onSelect={() => void copyEmail()}>
+                  <CommandItem onSelect={copyEmail}>
                     <Copy className="h-4 w-4 text-muted-foreground" />
                     <span className="flex-1">Copy Email</span>
                   </CommandItem>
