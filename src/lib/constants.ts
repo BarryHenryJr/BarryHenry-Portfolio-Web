@@ -296,3 +296,9 @@ export const STACK: StackItem[] = [
 export const GITHUB_URL = "https://github.com/barryhenryjr";
 export const LINKEDIN_URL = "https://linkedin.com/in/barrynhenry";
 export const EMAIL = "barryhenryjr@gmail.com";
+
+export const SOCIAL_LINKS = {
+  github: "https://github.com/barryhenryjr",
+  linkedin: "https://linkedin.com/in/barryhenryjr",
+  email: "hello@barryhenry.com",
+};
