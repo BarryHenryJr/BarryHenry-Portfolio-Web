@@ -68,7 +68,6 @@ export function CommandMenu() {
       await navigator.clipboard.writeText(EMAIL);
     } catch (error) {
       // Determine specific error message based on error type
-      const errorMessage = EMAIL;
       let userMessage = "Copy failed";
 
       if (error instanceof Error) {
@@ -85,20 +84,19 @@ export function CommandMenu() {
         } else if (error.name === 'SecurityError') {
           userMessage = "Cannot copy from insecure context";
         } else {
-          userMessage = "Copy failed - please copy manually";
+          userMessage = "Copy failed";
         }
       }
 
       // Show user-friendly error message with specific feedback
-      setCopyError(`${userMessage}. Email: ${errorMessage}`);
+      setCopyError(userMessage);
       setTimeout(() => setCopyError(null), 5000); // Clear after 5 seconds
     }
   }
 
   function toggleTheme() {
-    // Use resolvedTheme to respect system preferences when theme is set to "system"
-    const currentResolvedTheme = resolvedTheme || (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    setTheme(currentResolvedTheme === "dark" ? "light" : "dark");
+    const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
     setOpen(false);
   }
 
@@ -165,7 +163,7 @@ export function CommandMenu() {
                   <div className="flex items-center gap-2 text-sm">
                     <Copy className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">
-                      Copy failed. Email: <span className="font-mono text-foreground select-all">{copyError}</span>
+                      {copyError}. Please copy manually: <span className="font-mono text-foreground select-all">{EMAIL}</span>
                     </span>
                   </div>
                 </div>

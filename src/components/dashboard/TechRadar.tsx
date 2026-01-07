@@ -60,7 +60,7 @@ export function TechRadar() {
           className="w-full h-full"
           style={{ filter: 'drop-shadow(0 0 10px hsl(var(--foreground) / 0.2))' }}
           role="img"
-          aria-label="Technology radar visualization showing technology adoption status across languages, platforms, tools, and techniques categories"
+          aria-label="Interactive radar chart displaying technology adoption levels across four categories: languages, platforms, tools, and techniques"
         >
           <title>Technology Radar: Interactive visualization of technology adoption across languages, platforms, tools, and techniques</title>
           {/* Background */}

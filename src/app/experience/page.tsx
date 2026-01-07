@@ -7,9 +7,9 @@ export default function ExperiencePage() {
     <div className="space-y-8">
       {/* Page Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Changelog</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Experience</h1>
         <p className="text-muted-foreground">
-          A history of versions and major updates to my professional career.
+          A chronological history of my professional experience and career milestones.
         </p>
       </div>
 

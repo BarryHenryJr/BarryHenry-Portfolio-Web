@@ -232,7 +232,7 @@ To deploy manually:
 
    ```bash
    # Install Vercel CLI
-   npm i -g vercel
+   pnpm add -g vercel
 
    # Login to Vercel
    vercel login
