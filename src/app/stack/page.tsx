@@ -7,13 +7,10 @@ import { StackGrid } from "./components/StackGrid";
 const CATEGORY_ORDER: StackCategory[] = ["Frontend", "Backend", "DevOps", "Design", "Tools"];
 
 // Pre-compute grouped stack data at module level since STACK and CATEGORY_ORDER are constants
-const groupedStack = STACK.reduce((acc, item) => {
-  if (!acc[item.category]) {
-    acc[item.category] = [];
-  }
-  acc[item.category]!.push(item);
+const groupedStack = STACK.reduce<Partial<Record<StackCategory, StackItem[]>>>((acc, item) => {
+  (acc[item.category] = acc[item.category] || []).push(item);
   return acc;
-}, {} as Partial<Record<StackCategory, StackItem[]>>);
+}, {});
 
 const stackGroups = CATEGORY_ORDER
   .filter(category => groupedStack[category] && groupedStack[category]!.length > 0)

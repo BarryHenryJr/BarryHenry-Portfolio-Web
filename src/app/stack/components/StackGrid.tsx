@@ -68,17 +68,15 @@ const itemVariants: Variants = {
   },
 };
 
+// Badge variant mapping - defined outside function to prevent recreation on every call
+const PROFICIENCY_VARIANT_MAP: Record<StackItem['proficiency'], 'default' | 'secondary' | 'outline'> = {
+  'Expert': 'default',
+  'Advanced': 'secondary',
+  'Intermediate': 'outline',
+};
+
 function getBadgeVariant(proficiency: StackItem['proficiency']) {
-  switch (proficiency) {
-    case 'Expert':
-      return 'default';
-    case 'Advanced':
-      return 'secondary';
-    case 'Intermediate':
-      return 'outline';
-    default:
-      return 'outline';
-  }
+  return PROFICIENCY_VARIANT_MAP[proficiency] ?? 'outline';
 }
 
 interface StackCardProps {
