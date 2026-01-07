@@ -30,7 +30,7 @@ function ProjectLinkButton({ href, variant = "default", children }: ProjectLinkB
   }
 
   return (
-    <Button size="sm" variant={variant} className="flex-1" disabled tabIndex={-1}>
+    <Button size="sm" variant={variant} className="flex-1" disabled>
       {children}
     </Button>
   );

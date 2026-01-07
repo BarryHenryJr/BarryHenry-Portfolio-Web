@@ -34,7 +34,7 @@ export function Sidebar({ className }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+                    ? "bg-accent text-accent-foreground border border-accent"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
               >

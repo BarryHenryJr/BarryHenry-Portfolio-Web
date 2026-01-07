@@ -27,13 +27,13 @@ import { useTheme } from "next-themes";
 
 const GITHUB_URL = "https://github.com/barryhenryjr";
 const LINKEDIN_URL = "https://linkedin.com/in/barrynhenry";
-const EMAIL = "todo@example.com";
+const EMAIL = "barryhenryjr@gmail.com";
 
 export function CommandMenu() {
   const router = useRouter();
   const [open, setOpen] = React.useState<boolean>(false);
   const [copyError, setCopyError] = React.useState<string | null>(null);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -66,16 +66,39 @@ export function CommandMenu() {
 
     try {
       await navigator.clipboard.writeText(EMAIL);
-    } catch {
-      // Show user-friendly error message
-      setCopyError(EMAIL);
+    } catch (error) {
+      // Determine specific error message based on error type
+      const errorMessage = EMAIL;
+      let userMessage = "Copy failed";
+
+      if (error instanceof Error) {
+        // Log error for debugging (only in development)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Clipboard copy failed:', error);
+        }
+
+        // Provide specific user feedback based on error type
+        if (error.name === 'NotAllowedError') {
+          userMessage = "Permission denied - please allow clipboard access";
+        } else if (error.name === 'NotSupportedError') {
+          userMessage = "Clipboard not supported in this browser";
+        } else if (error.name === 'SecurityError') {
+          userMessage = "Cannot copy from insecure context";
+        } else {
+          userMessage = "Copy failed - please copy manually";
+        }
+      }
+
+      // Show user-friendly error message with specific feedback
+      setCopyError(`${userMessage}. Email: ${errorMessage}`);
       setTimeout(() => setCopyError(null), 5000); // Clear after 5 seconds
     }
   }
 
   function toggleTheme() {
-    const currentTheme = theme || "dark"; // Default to dark if theme is undefined
-    setTheme(currentTheme === "dark" ? "light" : "dark");
+    // Use resolvedTheme to respect system preferences when theme is set to "system"
+    const currentResolvedTheme = resolvedTheme || (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(currentResolvedTheme === "dark" ? "light" : "dark");
     setOpen(false);
   }
 
@@ -84,6 +107,7 @@ export function CommandMenu() {
       <AnimatePresence>
         {open && (
           <motion.div
+            key="command-menu"
             initial={{ opacity: 0, scale: 0.98, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: 8 }}

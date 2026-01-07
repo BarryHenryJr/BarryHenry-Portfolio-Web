@@ -141,7 +141,7 @@ jobs:
           fetch-depth: 0
 
       - name: Secret scanning
-        uses: trufflesecurity/trufflehog@v3.90.13
+        uses: trufflesecurity/trufflehog@f15cb8b37b9b70056bc82a8eb7151f75fad27a71 # v3.90.13
         with:
           path: ./
           base: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -188,13 +188,35 @@ jobs:
 
       - name: Update version badge in README.md
         run: |
-          BADGE="![version](https://img.shields.io/badge/version-${{ steps.get_version.outputs.version }}-blue)"
-          sed -i "s|!\[version\](https://img.shields.io/badge/version-[^-]*-blue)|$BADGE|" README.md
+          node -e "
+          const fs = require('fs');
+          const readme = fs.readFileSync('README.md', 'utf8');
+          const version = process.env.VERSION;
+          const oldBadgePattern = /!\[version\]\(https:\/\/img\.shields\.io\/badge\/version-[^-]+-blue\)/;
+          const newBadge = \`![version](https://img.shields.io/badge/version-\${version}-blue)\`;
+
+          if (!oldBadgePattern.test(readme)) {
+            console.error('Version badge pattern not found in README.md');
+            process.exit(1);
+          }
+
+          const updatedReadme = readme.replace(oldBadgePattern, newBadge);
+
+          if (updatedReadme === readme) {
+            console.error('Version badge was not updated');
+            process.exit(1);
+          }
+
+          fs.writeFileSync('README.md', updatedReadme);
+          console.log('Version badge updated successfully');
+          "
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
 
       - name: Commit and push version badge update
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add README.md
           if git diff --staged --quiet; then
             echo "No changes to commit"

@@ -58,7 +58,7 @@ export function TechRadar() {
         <svg
           viewBox="0 0 200 200"
           className="w-full h-full"
-          style={{ filter: 'drop-shadow(0 0 10px rgba(51, 65, 85, 0.3))' }}
+          style={{ filter: 'drop-shadow(0 0 10px hsl(var(--foreground) / 0.2))' }}
           role="img"
           aria-label="Technology radar visualization showing technology adoption status across languages, platforms, tools, and techniques categories"
         >
@@ -97,8 +97,6 @@ export function TechRadar() {
             const x = 100 + Math.cos(angle) * normalizedDistance;
             const y = 100 + Math.sin(angle) * normalizedDistance;
 
-            const ringLabel = item.ring.charAt(0).toUpperCase() + item.ring.slice(1);
-            const ariaLabel = `${item.name}: ${ringLabel} - ${item.quadrant.charAt(0).toUpperCase() + item.quadrant.slice(1)} quadrant`;
 
             return (
               <g key={item.name}>
@@ -108,9 +106,6 @@ export function TechRadar() {
                   r="4"
                   fill={getRingColor(item.ring)}
                   style={{ filter: `drop-shadow(0 0 4px ${getRingColor(item.ring)})` }}
-                  tabIndex={0}
-                  role="img"
-                  aria-label={ariaLabel}
                 />
                 <text
                   x={x}
@@ -131,19 +126,43 @@ export function TechRadar() {
         {/* Legend */}
         <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-400"></div>
+            <div
+              className="w-3 h-3 rounded-full opacity-80 border"
+              style={{
+                backgroundColor: 'hsl(var(--chart-1))',
+                borderColor: 'hsl(var(--chart-1))'
+              }}
+            ></div>
             <span className="text-muted-foreground">Adopt</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500/20 border border-blue-400"></div>
+            <div
+              className="w-3 h-3 rounded-full opacity-80 border"
+              style={{
+                backgroundColor: 'hsl(var(--chart-2))',
+                borderColor: 'hsl(var(--chart-2))'
+              }}
+            ></div>
             <span className="text-muted-foreground">Trial</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-400"></div>
+            <div
+              className="w-3 h-3 rounded-full opacity-80 border"
+              style={{
+                backgroundColor: 'hsl(var(--chart-3))',
+                borderColor: 'hsl(var(--chart-3))'
+              }}
+            ></div>
             <span className="text-muted-foreground">Assess</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-400"></div>
+            <div
+              className="w-3 h-3 rounded-full opacity-80 border"
+              style={{
+                backgroundColor: 'hsl(var(--chart-4))',
+                borderColor: 'hsl(var(--chart-4))'
+              }}
+            ></div>
             <span className="text-muted-foreground">Hold</span>
           </div>
         </div>

@@ -33,32 +33,33 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
   const previouslyFocusedElementRef = React.useRef<Element | null>(null);
 
   React.useEffect(() => {
-    function handleEscape(e: KeyboardEvent) {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Handle Escape key
       if (e.key === "Escape") {
         onOpenChange(false);
+        return;
       }
-    }
 
-    function handleTab(e: KeyboardEvent) {
-      if (e.key !== "Tab" || !dialogRef.current) return;
+      // Handle Tab key for focus management
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
-      const focusableElements = dialogRef.current.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      const firstElement = focusableElements[0] as HTMLElement;
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-      if (e.shiftKey) {
-        // Shift + Tab
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement?.focus();
-        }
-      } else {
-        // Tab
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement?.focus();
+        if (e.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+          }
         }
       }
     }
@@ -67,29 +68,26 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
       // Store the currently focused element
       previouslyFocusedElementRef.current = document.activeElement;
 
-      // Add event listeners
-      document.addEventListener("keydown", handleEscape);
-      document.addEventListener("keydown", handleTab);
+      // Add consolidated event listener
+      document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
 
       // Focus the first focusable element (usually the input)
-      // Use requestAnimationFrame for more reliable timing
-      requestAnimationFrame(() => {
+      // Use a robust approach to handle dynamic element availability
+      const focusFirstElement = (attempts = 0) => {
         const firstFocusable = dialogRef.current?.querySelector(
           'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'
         ) as HTMLElement;
+
         if (firstFocusable) {
           firstFocusable.focus();
-        } else {
-          // Fallback timeout if element isn't immediately available
-          setTimeout(() => {
-            const fallbackFocusable = dialogRef.current?.querySelector(
-              'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'
-            ) as HTMLElement;
-            fallbackFocusable?.focus();
-          }, 10);
+        } else if (attempts < 10) {
+          // Try again in the next animation frame, up to 10 attempts
+          requestAnimationFrame(() => focusFirstElement(attempts + 1));
         }
-      });
+      };
+
+      requestAnimationFrame(() => focusFirstElement());
     } else {
       // Restore focus to the previously focused element
       if (previouslyFocusedElementRef.current instanceof HTMLElement) {
@@ -99,8 +97,7 @@ function CommandDialog({ open, onOpenChange, children, label }: CommandDialogPro
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.removeEventListener("keydown", handleTab);
+      document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
   }, [open, onOpenChange]);
