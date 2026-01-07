@@ -74,8 +74,8 @@ export default function ProjectsPage() {
                 <div className="mt-auto space-y-3">
                   {/* Tech Stack Badges */}
                   <div className="flex flex-wrap gap-1">
-                    {project.tech.map((tech) => (
-                      <Badge key={tech} variant="secondary" className="text-xs">
+                    {project.tech.map((tech, index) => (
+                      <Badge key={`${tech}-${index}`} variant="secondary" className="text-xs">
                         {tech}
                       </Badge>
                     ))}

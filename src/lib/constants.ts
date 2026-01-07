@@ -59,7 +59,7 @@ export const PROJECTS: Project[] = [
     id: "portfolio-v1",
     title: "Admin Console Portfolio",
     description: "A high-fidelity personal portfolio designed to mimic a SaaS dashboard. Features a command palette, theme switching, and real-time metrics.",
-    icon: "LayoutDashboard", 
+    icon: "LayoutDashboard",
     status: "live",
     tech: ["Next.js", "Tailwind", "Shadcn", "Framer Motion"],
     href: "https://barryhenry.com",
@@ -114,3 +114,8 @@ export const EXPERIENCE: ExperienceItem[] = [
   },
   // Add more history...
 ];
+
+// Social and contact information
+export const GITHUB_URL = "https://github.com/barryhenryjr";
+export const LINKEDIN_URL = "https://linkedin.com/in/barrynhenry";
+export const EMAIL = "barryhenryjr@gmail.com";

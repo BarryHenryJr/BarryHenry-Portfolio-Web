@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 
@@ -29,127 +30,19 @@ type CommandDialogProps = {
 };
 
 function CommandDialog({ open, onOpenChange, children, label }: CommandDialogProps) {
-  const dialogRef = React.useRef<HTMLDivElement>(null);
-  const previouslyFocusedElementRef = React.useRef<Element | null>(null);
-
-  const handleKeyDown = React.useCallback(
-    (e: KeyboardEvent) => {
-      // Handle Escape key
-      if (e.key === "Escape") {
-        onOpenChange(false);
-        return;
-      }
-
-      // Handle Tab key for focus management
-      if (e.key === "Tab" && dialogRef.current) {
-        const focusableElements = dialogRef.current.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-        if (e.shiftKey) {
-          // Shift + Tab
-          if (document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement?.focus();
-          }
-        } else {
-          // Tab
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement?.focus();
-          }
-        }
-      }
-    },
-    [onOpenChange]
-  );
-
-  React.useEffect(() => {
-
-    if (open) {
-      // Store the currently focused element
-      previouslyFocusedElementRef.current = document.activeElement;
-
-      // Add consolidated event listener
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
-
-      // Focus the first focusable element (usually the input)
-      // Use a robust approach to handle dynamic element availability
-      const focusFirstElement = (attempts = 0) => {
-        const firstFocusable = dialogRef.current?.querySelector(
-          'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'
-        ) as HTMLElement;
-
-        if (firstFocusable) {
-          firstFocusable.focus();
-        } else if (attempts < 10) {
-          // Try again in the next animation frame, up to 10 attempts
-          requestAnimationFrame(() => focusFirstElement(attempts + 1));
-        }
-      };
-
-      requestAnimationFrame(() => focusFirstElement());
-    } else {
-      // Restore focus to the previously focused element
-      if (previouslyFocusedElementRef.current instanceof HTMLElement) {
-        previouslyFocusedElementRef.current.focus();
-      }
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [open, handleKeyDown]);
-
-  const handleBackdropActivation = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
-      // Only close if clicking the backdrop directly, not if clicking through to a child
-      if (e.target === e.currentTarget) {
-        onOpenChange(false);
-      }
-    },
-    [onOpenChange]
-  );
-
-  const handleBackdropKeyDown = React.useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onOpenChange(false);
-      }
-    },
-    [onOpenChange]
-  );
-
-  if (!open) return null;
-
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label="Close dialog"
-        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-        onClick={handleBackdropActivation}
-        onKeyDown={handleBackdropKeyDown}
-      />
-
-      {/* Dialog */}
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-label={label || "Command Palette"}
-        className="fixed left-1/2 top-1/2 z-50 w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-border bg-background shadow-2xl"
-      >
-        {children}
-      </div>
-    </>
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content
+          className="fixed left-1/2 top-1/2 z-50 w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-border bg-background shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]"
+          aria-label={label || "Command Palette"}
+          aria-modal="true"
+        >
+          {children}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
 
@@ -259,4 +152,3 @@ export {
   CommandSeparator,
   CommandShortcut,
 };
-

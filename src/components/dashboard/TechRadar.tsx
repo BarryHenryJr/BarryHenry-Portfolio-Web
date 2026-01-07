@@ -97,16 +97,16 @@ export function TechRadar() {
           <line x1="10" y1="100" x2="190" y2="100" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.5" />
 
           {/* Ring labels */}
-          <text x="100" y="35" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">ADOPT</text>
-          <text x="100" y="60" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">TRIAL</text>
-          <text x="100" y="85" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">ASSESS</text>
-          <text x="100" y="105" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500" role="text">HOLD</text>
+          <text x="100" y="35" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">ADOPT</text>
+          <text x="100" y="60" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">TRIAL</text>
+          <text x="100" y="85" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">ASSESS</text>
+          <text x="100" y="105" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="12" fontWeight="500">HOLD</text>
 
           {/* Quadrant labels */}
-          <text x="150" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">LANGUAGES</text>
-          <text x="50" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">PLATFORMS</text>
-          <text x="50" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">TOOLS</text>
-          <text x="150" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600" role="text">TECHNIQUES</text>
+          <text x="150" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">LANGUAGES</text>
+          <text x="50" y="45" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">PLATFORMS</text>
+          <text x="50" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">TOOLS</text>
+          <text x="150" y="155" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="12" fontWeight="600">TECHNIQUES</text>
 
           {/* Technology items */}
           {techItems.map((item) => {
@@ -117,9 +117,8 @@ export function TechRadar() {
             const x = 100 + Math.cos(angle) * normalizedDistance;
             const y = 100 + Math.sin(angle) * normalizedDistance;
 
-
             return (
-              <g key={item.name}>
+              <g key={`${item.name}-${item.quadrant}-${item.ring}`}>
                 <circle
                   cx={x}
                   cy={y}
@@ -134,7 +133,6 @@ export function TechRadar() {
                   fill="hsl(var(--foreground))"
                   fontSize="12"
                   fontWeight="500"
-                  role="text"
                   style={{ pointerEvents: 'none' }}
                 >
                   {item.name}

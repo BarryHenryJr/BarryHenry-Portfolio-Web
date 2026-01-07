@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Github,
   Linkedin,
@@ -11,7 +10,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { NAVIGATION_ITEMS, type NavigationItem } from "@/lib/constants";
+import { NAVIGATION_ITEMS, type NavigationItem, GITHUB_URL, LINKEDIN_URL, EMAIL } from "@/lib/constants";
 import {
   Command,
   CommandDialog,
@@ -24,10 +23,6 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { useTheme } from "next-themes";
-
-const GITHUB_URL = "https://github.com/barryhenryjr";
-const LINKEDIN_URL = "https://linkedin.com/in/barrynhenry";
-const EMAIL = "barryhenryjr@gmail.com";
 
 export function CommandMenu() {
   const router = useRouter();
@@ -102,16 +97,7 @@ export function CommandMenu() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen} label="Command Palette">
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="command-menu"
-            initial={{ opacity: 0, scale: 0.98, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 8 }}
-            transition={{ duration: 0.14, ease: "easeOut" }}
-          >
-            <Command className="bg-popover text-popover-foreground border-border">
+      <Command className="bg-popover text-popover-foreground border-border">
               <CommandInput placeholder="Search pages and actions…" />
               <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
@@ -174,9 +160,6 @@ export function CommandMenu() {
                 <span className="rounded-md border border-border bg-muted px-2 py-1">⌘K / Ctrl+K</span>
               </div>
             </Command>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </CommandDialog>
   );
 }

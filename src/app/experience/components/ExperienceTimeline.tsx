@@ -10,28 +10,30 @@ interface ExperienceTimelineProps {
   items: ExperienceItem[];
 }
 
-export function ExperienceTimeline({ items }: ExperienceTimelineProps) {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
+// Animation variants - defined outside component to prevent recreation on every render
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
     },
-  };
+  },
+};
 
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        ease: "easeOut",
-      },
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+      ease: "easeOut",
     },
-  };
+  },
+};
+
+export function ExperienceTimeline({ items }: ExperienceTimelineProps) {
 
   return (
     <motion.div
@@ -78,8 +80,8 @@ export function ExperienceTimeline({ items }: ExperienceTimelineProps) {
 
             <CardFooter className="pt-4">
               <div className="flex flex-wrap gap-1">
-                {item.tech.map((tech) => (
-                  <Badge key={tech} variant="secondary" className="text-xs">
+                {item.tech.map((tech, index) => (
+                  <Badge key={`${tech}-${index}`} variant="secondary" className="text-xs">
                     {tech}
                   </Badge>
                 ))}

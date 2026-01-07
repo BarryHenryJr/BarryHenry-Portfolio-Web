@@ -7,24 +7,26 @@ interface AnimatedGridProps {
   children: React.ReactNode;
 }
 
-export function AnimatedGrid({ children }: AnimatedGridProps) {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
+// Animation variants - defined outside component to prevent recreation on every render
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
     },
-  };
+  },
+};
 
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-    },
-  };
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+  },
+};
+
+export function AnimatedGrid({ children }: AnimatedGridProps) {
 
   return (
     <motion.div
