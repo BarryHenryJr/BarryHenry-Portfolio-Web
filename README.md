@@ -31,6 +31,44 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Git Hooks
+
+This project uses [Husky](https://typicode.github.io/husky/) to manage Git hooks for code quality and consistency.
+
+### Setup
+
+After cloning the repository, install dependencies and set up Git hooks:
+
+```bash
+pnpm install
+pnpm prepare  # This sets up Husky
+```
+
+### Pre-commit Hook
+
+The pre-commit hook automatically runs ESLint to ensure code quality before each commit:
+
+```bash
+pnpm lint  # Runs automatically on pre-commit
+```
+
+If linting fails, the commit will be blocked. Fix the issues and try committing again.
+
+### Additional Hooks (Optional)
+
+You can add more Git hooks by creating files in the `.husky/` directory. For example:
+
+- `commit-msg`: Validate commit messages
+- `pre-push`: Run tests before pushing
+
+Example commit-msg hook for conventional commits:
+```bash
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Add commitlint or custom validation here
+```
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
