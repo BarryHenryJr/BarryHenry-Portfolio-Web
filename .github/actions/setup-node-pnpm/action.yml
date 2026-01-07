@@ -13,12 +13,12 @@ runs:
   using: composite
   steps:
     - name: Setup Node.js
-      uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
 
     - name: Setup pnpm
-      uses: pnpm/action-setup@a86142548dae6260150b78742475a5626efa9930 # v4.0.0
+      uses: pnpm/action-setup@v4
       with:
         version: ${{ inputs.pnpm-version }}
 
