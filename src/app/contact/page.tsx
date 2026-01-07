@@ -1,11 +1,9 @@
 import React from "react";
 import { SOCIAL_LINKS } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
+import { ContactForm } from "./components/ContactForm";
 
 export default function ContactPage() {
   return (
@@ -21,94 +19,7 @@ export default function ContactPage() {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Column 1: Open a Ticket */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Open a Ticket</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="your.email@example.com"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Input
-                id="subject"
-                name="subject"
-                placeholder="Brief description of your issue"
-                required
-              />
-            </div>
-
-            <fieldset className="space-y-3">
-              <legend className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Priority
-              </legend>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    id="priority-low"
-                    name="priority"
-                    value="low"
-                    className="h-4 w-4 text-primary focus:ring-primary border-border"
-                  />
-                  <Label htmlFor="priority-low" className="text-sm">
-                    Low
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    id="priority-medium"
-                    name="priority"
-                    value="medium"
-                    className="h-4 w-4 text-primary focus:ring-primary border-border"
-                    defaultChecked
-                  />
-                  <Label htmlFor="priority-medium" className="text-sm">
-                    Medium
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    id="priority-high"
-                    name="priority"
-                    value="high"
-                    className="h-4 w-4 text-primary focus:ring-primary border-border"
-                  />
-                  <Label htmlFor="priority-high" className="text-sm">
-                    High
-                  </Label>
-                </div>
-              </div>
-            </fieldset>
-
-            <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea
-                id="message"
-                name="message"
-                placeholder="Please provide details about your issue..."
-                rows={4}
-                required
-              />
-            </div>
-          </CardContent>
-          <div className="px-6 pb-6">
-            <Button type="submit" className="w-full">
-              Submit Ticket
-            </Button>
-          </div>
-        </Card>
+        <ContactForm />
 
         {/* Column 2: Channel Status */}
         <div className="space-y-6">
@@ -178,11 +89,7 @@ export default function ContactPage() {
               </Button>
 
               <Button asChild variant="outline" className="w-full justify-start">
-                <a
-                  href={`mailto:${SOCIAL_LINKS.email}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={`mailto:${SOCIAL_LINKS.email}`}>
                   Email
                 </a>
               </Button>

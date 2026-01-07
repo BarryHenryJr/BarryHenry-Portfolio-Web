@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { NAVIGATION_ITEMS, type NavigationItem, GITHUB_URL, LINKEDIN_URL, EMAIL } from "@/lib/constants";
+import { NAVIGATION_ITEMS, type NavigationItem, SOCIAL_LINKS } from "@/lib/constants";
 import {
   Command,
   CommandDialog,
@@ -60,7 +60,7 @@ export function CommandMenu() {
     setOpen(false);
 
     try {
-      await navigator.clipboard.writeText(EMAIL);
+      await navigator.clipboard.writeText(SOCIAL_LINKS.email);
     } catch (error) {
       // Determine specific error message based on error type
       let userMessage = "Failed to copy email to clipboard";
@@ -118,12 +118,12 @@ export function CommandMenu() {
                 <CommandSeparator />
 
                 <CommandGroup heading="Social">
-                  <CommandItem onSelect={() => openExternal(GITHUB_URL)}>
+                  <CommandItem onSelect={() => openExternal(SOCIAL_LINKS.github)}>
                     <Github className="h-4 w-4 text-muted-foreground" />
                     <span className="flex-1">GitHub</span>
                     <CommandShortcut>↗</CommandShortcut>
                   </CommandItem>
-                  <CommandItem onSelect={() => openExternal(LINKEDIN_URL)}>
+                  <CommandItem onSelect={() => openExternal(SOCIAL_LINKS.linkedin)}>
                     <Linkedin className="h-4 w-4 text-muted-foreground" />
                     <span className="flex-1">LinkedIn</span>
                     <CommandShortcut>↗</CommandShortcut>
@@ -149,7 +149,7 @@ export function CommandMenu() {
                   <div className="flex items-center gap-2 text-sm">
                     <Copy className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">
-                      {copyError}. Please copy manually: <span className="font-mono text-foreground select-all">{EMAIL}</span>
+                      {copyError}. Please copy manually: <span className="font-mono text-foreground select-all">{SOCIAL_LINKS.email}</span>
                     </span>
                   </div>
                 </div>
