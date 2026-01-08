@@ -15,10 +15,10 @@ type Event = {
 
 function formatRelativeAge(ageMs: number): string {
   if (ageMs < 0) return "0ms";
-  if (ageMs < 1000) return `${Math.max(0, Math.round(ageMs))}ms`;
+  if (ageMs < 1000) return `${Math.round(ageMs)}ms`;
 
   const seconds = Math.floor(ageMs / 1000);
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 60) return `${seconds}s ago`;
 
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
@@ -74,10 +74,7 @@ export function ActivityFeed() {
     };
   });
 
-  const firstDeploy = deployEvents[0];
-  const remainingDeploys = deployEvents.slice(1);
-
-  const events: Event[] = [
+  const hardcodedEvents: Event[] = [
     {
       id: "commit-1",
       type: "code",
@@ -85,13 +82,12 @@ export function ActivityFeed() {
       detail: "commit 7f3a2c1",
       ageMs: 12 * 60 * 1000,
     },
-    ...(firstDeploy == null ? [] : [firstDeploy]),
     {
       id: "system-1",
       type: "system",
       title: "Rate limit thresholds optimized",
       detail: "redis-backed limiter tuned",
-      ageMs: 14,
+      ageMs: 14 * 60 * 1000,
     },
     {
       id: "commit-2",
@@ -100,7 +96,6 @@ export function ActivityFeed() {
       detail: "commit b91d8e0",
       ageMs: 46 * 60 * 1000,
     },
-    ...remainingDeploys,
     {
       id: "system-2",
       type: "system",
@@ -109,6 +104,10 @@ export function ActivityFeed() {
       ageMs: 6 * 60 * 60 * 1000,
     },
   ];
+
+  const events: Event[] = [...deployEvents, ...hardcodedEvents].sort(
+    (a, b) => a.ageMs - b.ageMs
+  );
 
   return (
     <div className="rounded-lg border border-border bg-card p-6">
@@ -129,12 +128,12 @@ export function ActivityFeed() {
 
           return (
             <li key={event.id} className="relative pl-10 pb-4 last:pb-0">
-              {!isLast ? (
+              {!isLast && (
                 <div
                   className="absolute left-3 top-7 bottom-0 w-px bg-border"
                   aria-hidden="true"
                 />
-              ) : null}
+              )}
 
               <div
                 className={`absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border ${meta.nodeClassName}`}
@@ -153,7 +152,7 @@ export function ActivityFeed() {
                     {formatRelativeAge(event.ageMs)}
                   </span>
                 </div>
-                {event.detail == null ? null : (
+                {event.detail && (
                   <p className="mt-1 text-xs text-muted-foreground">
                     {event.detail}
                   </p>
