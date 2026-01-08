@@ -80,8 +80,8 @@ if (typeof globalThis !== 'undefined' && !globalThis.redisCleanupInterval) {
     if (redisClient && (now - lastActivity) > CONNECTION_TIMEOUT) {
       try {
         await redisClient.quit();
-      } catch {
-        // Ignore cleanup errors
+      } catch (cleanupError) {
+        console.warn('Redis periodic cleanup failed:', cleanupError instanceof Error ? cleanupError.message : String(cleanupError));
       } finally {
         redisClient = null;
         redisConnectPromise = null;
@@ -91,20 +91,11 @@ if (typeof globalThis !== 'undefined' && !globalThis.redisCleanupInterval) {
     }
   }, CLEANUP_INTERVAL);
 
-  // Cleanup on process exit
-  process.on('exit', async () => {
-    await closeRedisConnection();
-    if (globalThis.redisCleanupInterval) {
-      clearInterval(globalThis.redisCleanupInterval);
-    }
-  });
-
   process.on('SIGTERM', async () => {
     await closeRedisConnection();
     if (globalThis.redisCleanupInterval) {
       clearInterval(globalThis.redisCleanupInterval);
     }
-    process.exit(0);
   });
 
   process.on('SIGINT', async () => {
@@ -112,7 +103,6 @@ if (typeof globalThis !== 'undefined' && !globalThis.redisCleanupInterval) {
     if (globalThis.redisCleanupInterval) {
       clearInterval(globalThis.redisCleanupInterval);
     }
-    process.exit(0);
   });
 }
 
@@ -148,6 +138,7 @@ async function getRedisClient(redisUrl: string): Promise<RedisClientType> {
       redisClient = null;
       redisConnectPromise = null;
       rateLimiter = null;
+      anonymousRateLimiter = null;
     });
   }
 
@@ -221,30 +212,28 @@ async function closeRedisConnection(): Promise<void> {
 }
 
 async function getRateLimiter(redisUrl: string, isAnonymous = false): Promise<RateLimiterRedis> {
-  if (isAnonymous) {
-    if (anonymousRateLimiter == null) {
-      const client = await getRedisClient(redisUrl);
-      // Anonymous clients get much stricter limits: 1 request per minute
-      anonymousRateLimiter = new RateLimiterRedis({
-        storeClient: client,
-        keyPrefix: "public_api_me_anon",
-        points: 1,
-        duration: 60,
-      });
+  const config = isAnonymous
+    ? { limiter: anonymousRateLimiter, keyPrefix: "public_api_me_anon", points: 1 }
+    : { limiter: rateLimiter, keyPrefix: "public_api_me", points: 10 };
+
+  if (config.limiter == null) {
+    const client = await getRedisClient(redisUrl);
+    config.limiter = new RateLimiterRedis({
+      storeClient: client,
+      keyPrefix: config.keyPrefix,
+      points: config.points,
+      duration: 60,
+    });
+
+    // Update the global reference
+    if (isAnonymous) {
+      anonymousRateLimiter = config.limiter;
+    } else {
+      rateLimiter = config.limiter;
     }
-    return anonymousRateLimiter;
-  } else {
-    if (rateLimiter == null) {
-      const client = await getRedisClient(redisUrl);
-      rateLimiter = new RateLimiterRedis({
-        storeClient: client,
-        keyPrefix: "public_api_me",
-        points: 10,
-        duration: 60,
-      });
-    }
-    return rateLimiter;
   }
+
+  return config.limiter;
 }
 
 async function validateEnvironment(): Promise<{ success: false; response: NextResponse } | { success: true; env: { REDIS_URL: string } }> {
