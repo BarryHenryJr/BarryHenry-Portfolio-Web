@@ -64,49 +64,28 @@ let redisClient: RedisClientType | null = null;
 let redisConnectPromise: Promise<void> | null = null;
 let rateLimiter: RateLimiterRedis | null = null;
 let anonymousRateLimiter: RateLimiterRedis | null = null;
-let lastActivity: number = 0;
-const CONNECTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-const CLEANUP_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
 // Extend globalThis to include our cleanup interval
 declare global {
   var redisCleanupInterval: NodeJS.Timeout | undefined;
 }
 
-// Periodic cleanup to prevent connection leaks in serverless environments
-if (typeof globalThis !== 'undefined' && !globalThis.redisCleanupInterval) {
-  globalThis.redisCleanupInterval = setInterval(async () => {
-    const now = Date.now();
-    if (redisClient && (now - lastActivity) > CONNECTION_TIMEOUT) {
-      await closeRedisConnection();
-    }
-  }, CLEANUP_INTERVAL);
-
-  process.on('SIGTERM', async () => {
-    await closeRedisConnection();
-    if (globalThis.redisCleanupInterval) {
-      clearInterval(globalThis.redisCleanupInterval);
-    }
-  });
-
-  process.on('SIGINT', async () => {
-    await closeRedisConnection();
-    if (globalThis.redisCleanupInterval) {
-      clearInterval(globalThis.redisCleanupInterval);
-    }
-  });
-}
+// Note: In serverless environments like Railway, Redis connections are managed
+// automatically by the platform and the redis package. We rely on Railway's
+// connection pooling and Redis's built-in timeouts rather than manual cleanup.
 
 async function getRedisClient(redisUrl: string): Promise<RedisClientType> {
-  lastActivity = Date.now();
-
   if (redisClient == null) {
     redisClient = createClient({
       url: redisUrl,
       socket: {
         reconnectStrategy: (retries: number): number | false => {
-          if (retries > 3) return false; // Stop after 3 retries
-          return Math.min(retries * 1000, 3000); // Exponential backoff
+          // Allow up to 10 retries with increasing delays
+          if (retries > 10) return false; // Stop after 10 retries
+
+          // Exponential backoff: 1s, 2s, 4s, 8s, 15s, 30s, 60s, 120s, 240s, 300s
+          const delay = Math.min(Math.pow(2, retries) * 1000, 300000); // Cap at 5 minutes
+          return delay;
         },
       },
     });
@@ -141,27 +120,13 @@ async function ensureRedisConnected(redisUrl: string): Promise<void> {
 
   if (client.isOpen && client.isReady) return;
 
-  // Use double-checked locking to prevent race conditions
+  // Use an immediately invoked async function to ensure atomic connection initialization
+  // This prevents race conditions where multiple requests could create separate connection promises
   if (redisConnectPromise == null) {
-    // Create a new promise and immediately assign it to prevent race conditions
-    let resolveConnection: () => void;
-    let rejectConnection: (error: Error) => void;
-
-    const connectionPromise = new Promise<void>((resolve, reject) => {
-      resolveConnection = resolve;
-      rejectConnection = reject;
-    });
-
-    // Atomically assign the promise to prevent other requests from creating new ones
-    redisConnectPromise = connectionPromise;
-
-    // Now attempt the connection
-    client.connect()
-      .then(() => {
-        lastActivity = Date.now();
-        resolveConnection();
-      })
-      .catch(async (err) => {
+    redisConnectPromise = (async (): Promise<void> => {
+      try {
+        await client.connect();
+      } catch (err) {
         // Log connection failure for debugging
         console.error('Redis connection failed:', {
           error: err instanceof Error ? err.message : String(err),
@@ -170,8 +135,9 @@ async function ensureRedisConnected(redisUrl: string): Promise<void> {
         });
 
         await closeRedisConnection();
-        rejectConnection(err);
-      });
+        throw err;
+      }
+    })();
   }
 
   await redisConnectPromise;
@@ -196,6 +162,8 @@ async function closeRedisConnection(): Promise<void> {
 async function getRateLimiter(redisUrl: string, isAnonymous = false): Promise<RateLimiterRedis> {
   if (isAnonymous) {
     if (anonymousRateLimiter === null) {
+      // Ensure Redis connection is established before creating rate limiter
+      await ensureRedisConnected(redisUrl);
       const client = await getRedisClient(redisUrl);
       anonymousRateLimiter = new RateLimiterRedis({
         storeClient: client,
@@ -208,6 +176,8 @@ async function getRateLimiter(redisUrl: string, isAnonymous = false): Promise<Ra
   }
 
   if (rateLimiter === null) {
+    // Ensure Redis connection is established before creating rate limiter
+    await ensureRedisConnected(redisUrl);
     const client = await getRedisClient(redisUrl);
     rateLimiter = new RateLimiterRedis({
       storeClient: client,
@@ -282,24 +252,42 @@ async function checkRateLimit(request: NextRequest, redisUrl: string): Promise<{
   const ip = getClientIp(request);
   const isAnonymous = ip == null;
 
-  // Get the appropriate rate limiter based on client type
-  const limiter = await getRateLimiter(redisUrl, isAnonymous);
+  // For anonymous clients, skip rate limiting but log for monitoring
+  if (isAnonymous) {
+    console.info("Anonymous client access (no rate limiting):", {
+      userAgent: request.headers.get("user-agent") || "unknown",
+      timestamp: new Date().toISOString(),
+      path: request.nextUrl.pathname
+    });
+    return { success: true };
+  }
 
+  // For identified clients, apply normal rate limiting
   try {
-    // Use IP for identified clients, or a shared anonymous key for unidentified clients
-    const rateLimitKey = isAnonymous ? "anonymous_clients" : ip!;
-    await limiter.consume(rateLimitKey);
+    const limiter = await getRateLimiter(redisUrl, false);
+
+    // Check if Redis client is still connected before using rate limiter
+    const client = await getRedisClient(redisUrl);
+    if (!client.isOpen || !client.isReady) {
+      console.warn("Redis client not ready for rate limiting, skipping");
+      return { success: true }; // Allow request but log the issue
+    }
+
+    await limiter.consume(ip);
     return { success: true };
   } catch (error: unknown) {
     if (!isRateLimiterRes(error)) {
-      console.error("Unexpected error during rate limiting:", error);
-      return {
-        success: false,
-        response: NextResponse.json(
-          { error: "Rate limiter error" },
-          { status: 500, headers }
-        )
-      };
+      console.error("Unexpected error during rate limiting:", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        redisUrl: redisUrl.replace(/:[^:]*@/, ':***@'), // Mask password in logs
+        timestamp: new Date().toISOString()
+      });
+
+      // If rate limiting fails due to Redis issues, allow the request
+      // This prevents the API from being completely unusable due to rate limiting problems
+      console.warn("Rate limiting failed, allowing request to proceed");
+      return { success: true };
     }
 
     const retryAfterSeconds = Math.max(0, Math.ceil(error.msBeforeNext / 1000));
@@ -365,11 +353,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const envResult = await validateEnvironment();
   if (!envResult.success) return envResult.response;
 
-  // Validate server data integrity (before expensive operations)
+  // Validate server data integrity (fast check before expensive Redis operations)
   const dataValidation = validateServerData();
   if (!dataValidation.success) return dataValidation.response;
 
-  // Validate Redis connection
+  // Validate Redis connection (expensive operation)
   const redisResult = await validateRedisConnection(envResult.env.REDIS_URL);
   if (!redisResult.success) return redisResult.response;
 
@@ -384,9 +372,29 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   return NextResponse.json(dataResult.payload, { headers });
 }
 
-export async function OPTIONS(): Promise<NextResponse> {
+export async function OPTIONS(request: NextRequest): Promise<NextResponse> {
+  const headers = buildStandardHeaders();
+
+  // Apply rate limiting to OPTIONS requests to prevent abuse
+  // Note: This requires REDIS_URL to be available at runtime
+  try {
+    const envValidation = envSchema.safeParse({
+      REDIS_URL: process.env.REDIS_URL,
+    });
+
+    if (envValidation.success) {
+      const rateLimitResult = await checkRateLimit(request, envValidation.data.REDIS_URL);
+      if (!rateLimitResult.success) {
+        return rateLimitResult.response;
+      }
+    }
+    // If Redis is not configured, allow OPTIONS requests to prevent CORS issues
+  } catch {
+    // If rate limiting fails, still allow OPTIONS to prevent blocking legitimate CORS preflights
+  }
+
   return new NextResponse(null, {
     status: 204,
-    headers: buildStandardHeaders(),
+    headers,
   });
 }
