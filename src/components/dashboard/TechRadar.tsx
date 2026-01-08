@@ -15,7 +15,7 @@ type TechItem = {
   name: string;
   quadrant: Quadrant;
   ring: Ring;
-  x: number; // percentage coordinates (-100 to 100)
+  x: number; // coordinates (-65 to 70) for optimal visual distribution
   y: number;
   description?: string;
 };
@@ -49,39 +49,51 @@ const RINGS = [
   { key: 'hold' as const, radius: 100, color: 'var(--chart-4)', label: 'Hold' },
 ] as const;
 
+// Performance optimization: O(1) lookup map for rings
+const RINGS_MAP = Object.fromEntries(RINGS.map(r => [r.key, r])) as Record<Ring, typeof RINGS[number]>;
+
+// SVG Layout Constants
+const VIEW_BOX_SIZE = 300;
+const CENTER = VIEW_BOX_SIZE / 2;
+const SCALE_FACTOR = 1.4; // Unified scale factor for both rings and item positioning
+const QUADRANT_PADDING = 10;
+const LABEL_PADDING = 20;
+const BOTTOM_LABEL_OFFSET = 30;
+
 export function TechRadar() {
   const [hoveredItem, setHoveredItem] = useState<TechItem | null>(null);
   const [activeItem, setActiveItem] = useState<TechItem | null>(null);
+  const [focusedItem, setFocusedItem] = useState<TechItem | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
   // Helper to map radar coordinates to SVG pixels
-  // Center is 150,150 in a 300x300 viewBox
   const mapToSvg = (x: number, y: number) => ({
-    cx: 150 + (x * 1.2), // 1.2 scale factor to spread them out
-    cy: 150 + (y * 1.2)
+    cx: CENTER + (x * SCALE_FACTOR),
+    cy: CENTER + (y * SCALE_FACTOR)
   });
 
   // Handle outside clicks to close active item
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node) && activeItem) {
         setActiveItem(null);
       }
     };
 
     document.addEventListener('pointerdown', handlePointerDown);
     return () => document.removeEventListener('pointerdown', handlePointerDown);
-  }, []);
+  }, [activeItem]);
 
-  const shownItem = hoveredItem ?? activeItem;
+  // Prioritizes hovered items over active items for tooltip display
+  const tooltipItem = hoveredItem ?? activeItem;
 
   return (
     <Card className="h-full flex flex-col overflow-visible">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Radar className="h-5 w-5 text-muted-foreground" />
+        <Radar className="h-5 w-5 text-muted-foreground" />
             <CardTitle>Tech Radar</CardTitle>
           </div>
           {/* Legend/Key */}
@@ -96,56 +108,27 @@ export function TechRadar() {
               </div>
             ))}
           </div>
-        </div>
+      </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex items-center justify-center p-6 relative min-h-[350px]" ref={containerRef}>
-        {/* Interactive Tooltip Overlay */}
-        <AnimatePresence>
-          {shownItem && (
-            <motion.div
-              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
-              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute z-20 top-4 left-4 right-4 pointer-events-none"
-            >
-              <div className="bg-popover/90 backdrop-blur-md border border-border p-3 rounded-lg shadow-xl flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-popover-foreground">{shownItem.name}</span>
-                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 uppercase">
-                      {shownItem.quadrant}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{shownItem.description}</p>
-                </div>
-                <Badge
-                  className="capitalize"
-                  style={{
-                    backgroundColor: RINGS.find(r => r.key === shownItem.ring)?.color,
-                    color: 'white'
-                  }}
-                >
-                  {shownItem.ring}
-                </Badge>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
+      <CardContent className="flex-1 flex flex-col items-center justify-center relative min-h-[350px]" ref={containerRef}>
         {/* Radar SVG */}
-        <svg viewBox="0 0 300 300" className="w-full h-full max-w-[350px]">
-          <title>Technology Radar: Interactive visualization of technology adoption across languages, platforms, tools, and techniques</title>
+        <svg viewBox={`0 0 ${VIEW_BOX_SIZE} ${VIEW_BOX_SIZE}`} className="w-full h-full max-w-[350px]">
+          <title>Technology Radar</title>
+          <desc>
+            Interactive radar chart showing technology adoption levels across four categories: languages, platforms, tools, and techniques.
+            Technologies are positioned in concentric rings representing adoption phases from center outward: Adopt, Trial, Assess, Hold.
+            Click or tap on technology points to view details, or use keyboard navigation with Tab and Enter keys.
+          </desc>
 
           {/* 1. Concentric Rings (Background) */}
           <g className="opacity-20 dark:opacity-30">
             {RINGS.map((ring) => (
               <circle
                 key={ring.key}
-                cx="150"
-                cy="150"
-                r={ring.radius * 1.4} // Scale visual radius
+                cx={CENTER}
+                cy={CENTER}
+                r={ring.radius * SCALE_FACTOR}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1"
@@ -157,25 +140,40 @@ export function TechRadar() {
 
           {/* 2. Quadrant Dividers */}
           <g className="text-border opacity-50">
-            <line x1="150" y1="10" x2="150" y2="290" stroke="currentColor" strokeWidth="1" />
-            <line x1="10" y1="150" x2="290" y2="150" stroke="currentColor" strokeWidth="1" />
+            <line
+              x1={CENTER}
+              y1={QUADRANT_PADDING}
+              x2={CENTER}
+              y2={VIEW_BOX_SIZE - QUADRANT_PADDING}
+              stroke="currentColor"
+              strokeWidth="1"
+            />
+            <line
+              x1={QUADRANT_PADDING}
+              y1={CENTER}
+              x2={VIEW_BOX_SIZE - QUADRANT_PADDING}
+              y2={CENTER}
+              stroke="currentColor"
+              strokeWidth="1"
+            />
           </g>
 
           {/* 3. Quadrant Labels */}
           <g className="text-[10px] font-mono font-semibold fill-muted-foreground uppercase tracking-wider opacity-60">
-            <text x="280" y="140" textAnchor="end">Languages</text>
-            <text x="20" y="140" textAnchor="start">Platforms</text>
-            <text x="20" y="170" textAnchor="start">Tools</text>
-            <text x="280" y="170" textAnchor="end">Techniques</text>
+            <text x={VIEW_BOX_SIZE - LABEL_PADDING} y={CENTER} textAnchor="end">Languages</text>
+            <text x={LABEL_PADDING} y={CENTER} textAnchor="start">Platforms</text>
+            <text x={LABEL_PADDING} y={CENTER + BOTTOM_LABEL_OFFSET} textAnchor="start">Tools</text>
+            <text x={VIEW_BOX_SIZE - LABEL_PADDING} y={CENTER + BOTTOM_LABEL_OFFSET} textAnchor="end">Techniques</text>
           </g>
 
           {/* 4. Tech Blips (Interactive) */}
           {TECH_ITEMS.map((item) => {
             const { cx, cy } = mapToSvg(item.x, item.y);
-            const ringColor = RINGS.find(r => r.key === item.ring)?.color;
+            const ringColor = RINGS_MAP[item.ring]?.color;
             const isHovered = hoveredItem?.id === item.id;
             const isActive = activeItem?.id === item.id;
-            const isDimmed = shownItem && !isHovered && !isActive;
+            const isDimmed = tooltipItem && !isHovered && !isActive;
+            const isFocused = focusedItem?.id === item.id;
 
             return (
               <motion.g
@@ -193,6 +191,8 @@ export function TechRadar() {
                 }}
                 onPointerEnter={() => setHoveredItem(item)}
                 onPointerLeave={() => setHoveredItem(null)}
+                onFocus={() => setFocusedItem(item)}
+                onBlur={() => setFocusedItem(null)}
                 onClick={() => setActiveItem(activeItem?.id === item.id ? null : item)}
                 className="cursor-pointer"
                 role="button"
@@ -207,50 +207,58 @@ export function TechRadar() {
               >
                 {/* Ping Animation for Adopted Tech */}
                 {item.ring === 'adopt' && !shouldReduceMotion && (
-                  <circle cx={cx} cy={cy} r="8">
-                    <animate
-                      attributeName="r"
-                      from="3"
-                      to="12"
-                      dur="3s"
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="opacity"
-                      from="0.3"
-                      to="0"
-                      dur="3s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
+                  <motion.circle
+                    cx={cx}
+                    cy={cy}
+                    r={8}
+                    fill={ringColor}
+                    opacity={0.3}
+                    animate={{
+                      r: [3, 12, 3],
+                      opacity: [0.3, 0, 0.3],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
                 )}
 
                 {/* Main Blip */}
-                <motion.circle
+                <circle
                   cx={cx}
                   cy={cy}
-                  r={isHovered || isActive ? 6 : 4}
+                  r="4"
                   fill={ringColor}
                   stroke="var(--background)"
                   strokeWidth="2"
-                  animate={{
-                    scale: isHovered || isActive ? 1.2 : 1,
-                  }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
                 />
+
+                {/* Focus Ring */}
+                {isFocused && (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={8}
+                    fill="none"
+                    stroke="var(--ring)"
+                    strokeWidth="2"
+                    strokeDasharray="4 2"
+                  />
+                )}
 
                 {/* Label (Dimmed by default) */}
                 <motion.text
                   x={cx}
                   y={cy + 12}
                   textAnchor="middle"
-                  className={`text-[8px] font-medium fill-foreground ${
-                    isHovered || isActive ? 'font-bold text-[10px] fill-primary' : 'opacity-40'
-                  }`}
-                  style={{ textShadow: '0 1px 4px rgb(0 0 0 / 0.5)' }}
+                  className="text-[8px] font-medium fill-foreground"
+                  style={{ textShadow: '0 1px 4px color-mix(in srgb, var(--foreground) 80%, transparent)' }}
                   animate={{
                     opacity: isHovered || isActive ? 1 : 0.4,
-                    scale: isHovered || isActive ? 1.1 : 1,
+                    scale: isHovered || isActive ? 1.25 : 1,
+                    fill: isHovered || isActive ? 'var(--primary)' : 'var(--foreground)',
                   }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                 >
@@ -260,6 +268,40 @@ export function TechRadar() {
             );
           })}
         </svg>
+
+        {/* Technology Details Panel */}
+        <AnimatePresence>
+          {tooltipItem && (
+            <motion.div
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="mt-4 w-full max-w-md"
+            >
+              <div className="bg-popover/90 backdrop-blur-md border border-border p-3 rounded-lg shadow-xl flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm text-popover-foreground">{tooltipItem.name}</span>
+                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 uppercase">
+                      {tooltipItem.quadrant}
+                    </Badge>
+          </div>
+                  <p className="text-xs text-muted-foreground">{tooltipItem.description}</p>
+          </div>
+                <Badge
+                  className="capitalize"
+                  style={{
+                    backgroundColor: RINGS_MAP[tooltipItem.ring]?.color,
+                    color: 'var(--foreground)'
+                  }}
+                >
+                  {tooltipItem.ring}
+                </Badge>
+          </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </CardContent>
     </Card>
   );
