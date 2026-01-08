@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Activity, AlertCircle, GitCommit, Rocket } from "lucide-react";
 
 import { PROJECTS } from "@/lib/constants";
@@ -15,7 +16,7 @@ type Event = {
 
 function formatRelativeAge(ageMs: number): string {
   if (ageMs < 0) return "0ms";
-  if (ageMs < 1000) return `${Math.round(ageMs)}ms`;
+  if (ageMs < 1000) return "just now";
 
   const seconds = Math.floor(ageMs / 1000);
   if (seconds < 60) return `${seconds}s ago`;
@@ -60,54 +61,58 @@ const EVENT_META: Record<
 };
 
 export function ActivityFeed() {
-  const deployEvents: Event[] = PROJECTS.filter(
-    (p) => p.status !== "archived"
-  ).map((project, index) => {
-    const ageMs = (index + 2) * 60 * 60 * 1000; // 2h, 3h, 4h...
+  const events: Event[] = useMemo(() => {
+    const deployEvents: Event[] = PROJECTS.filter(
+      (p) => p.status !== "archived"
+    ).map((project, index) => {
+      // Deployments are spaced 1 hour apart, starting 2 hours ago
+      // First project: 2 hours ago, second: 3 hours ago, etc.
+      const ageMs = (index + 2) * 60 * 60 * 1000;
 
-    return {
-      id: `deploy-${project.id}`,
-      type: "deploy",
-      title: `Deployed ${project.title}`,
-      detail: `Status: ${project.status}`,
-      ageMs,
-    };
-  });
+      return {
+        id: `deploy-${project.id}`,
+        type: "deploy",
+        title: `Deployed ${project.title}`,
+        detail: `Status: ${project.status}`,
+        ageMs,
+      };
+    });
 
-  const hardcodedEvents: Event[] = [
-    {
-      id: "commit-1",
-      type: "code",
-      title: "feat(dashboard): add System Events feed",
-      detail: "commit 7f3a2c1",
-      ageMs: 12 * 60 * 1000,
-    },
-    {
-      id: "system-1",
-      type: "system",
-      title: "Rate limit thresholds optimized",
-      detail: "redis-backed limiter tuned",
-      ageMs: 14 * 60 * 1000,
-    },
-    {
-      id: "commit-2",
-      type: "code",
-      title: "fix(api): harden client IP detection",
-      detail: "commit b91d8e0",
-      ageMs: 46 * 60 * 1000,
-    },
-    {
-      id: "system-2",
-      type: "system",
-      title: "Cache purged",
-      detail: "stale artifacts removed",
-      ageMs: 6 * 60 * 60 * 1000,
-    },
-  ];
+    const activityEvents: Event[] = [
+      {
+        id: "commit-1",
+        type: "code",
+        title: "feat(dashboard): add System Events feed",
+        detail: "commit 7f3a2c1",
+        ageMs: 12 * 60 * 1000,
+      },
+      {
+        id: "system-1",
+        type: "system",
+        title: "Rate limit thresholds optimized",
+        detail: "redis-backed limiter tuned",
+        ageMs: 14 * 60 * 1000,
+      },
+      {
+        id: "commit-2",
+        type: "code",
+        title: "fix(api): harden client IP detection",
+        detail: "commit b91d8e0",
+        ageMs: 46 * 60 * 1000,
+      },
+      {
+        id: "system-2",
+        type: "system",
+        title: "Cache purged",
+        detail: "stale artifacts removed",
+        ageMs: 6 * 60 * 60 * 1000,
+      },
+    ];
 
-  const events: Event[] = [...deployEvents, ...hardcodedEvents].sort(
-    (a, b) => a.ageMs - b.ageMs
-  );
+    return [...deployEvents, ...activityEvents].sort(
+      (a, b) => a.ageMs - b.ageMs
+    );
+  }, []); // PROJECTS is a constant, so no dependencies needed
 
   return (
     <div className="rounded-lg border border-border bg-card p-6">
@@ -137,7 +142,6 @@ export function ActivityFeed() {
 
               <div
                 className={`absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border ${meta.nodeClassName}`}
-                role="img"
                 aria-label={meta.iconLabel}
               >
                 <meta.Icon className={`h-3.5 w-3.5 ${meta.iconClassName}`} />
