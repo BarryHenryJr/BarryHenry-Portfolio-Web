@@ -65,7 +65,11 @@ const QUADRANT_PADDING = 10;
 const LABEL_PADDING = 20;
 const BOTTOM_LABEL_OFFSET = 30;
 
-// Theme Color Constants (removed - no longer used after fixing animation compatibility)
+// Helper to map radar coordinates to SVG pixels
+const mapToSvg = (x: number, y: number) => ({
+  cx: CENTER + (x * SCALE_FACTOR),
+  cy: CENTER + (y * SCALE_FACTOR)
+});
 
 export function TechRadar() {
   const [hoveredItem, setHoveredItem] = useState<TechItem | null>(null);
@@ -73,12 +77,6 @@ export function TechRadar() {
   const [focusedItem, setFocusedItem] = useState<TechItem | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
-
-  // Helper to map radar coordinates to SVG pixels
-  const mapToSvg = (x: number, y: number) => ({
-    cx: CENTER + (x * SCALE_FACTOR),
-    cy: CENTER + (y * SCALE_FACTOR)
-  });
 
   // Handle outside clicks to close active item
   useEffect(() => {
@@ -322,9 +320,8 @@ export function TechRadar() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className={tooltipPositionClasses}
             >
-              <div className={`bg-popover/90 border border-border p-3 rounded-lg shadow-xl flex items-center justify-between ${
-                shouldReduceMotion ? '' : 'backdrop-blur-md' // Conditional backdrop-blur for performance with reduced motion
-              }`}>
+              <div className="bg-popover/90 backdrop-blur-md border border-border p-3 rounded-lg shadow-xl flex items-center justify-between">
+                {/* backdrop-blur provides visual clarity for tooltip readability */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-popover-foreground">{tooltipItem.name}</span>
