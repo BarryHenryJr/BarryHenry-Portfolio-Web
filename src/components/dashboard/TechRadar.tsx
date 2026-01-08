@@ -49,7 +49,7 @@ const RINGS = [
   { key: 'hold' as const, radius: 100, color: 'var(--chart-4)', label: 'Hold' },
 ] as const;
 
-// Performance optimization: O(1) lookup map for rings
+// Lookup map for rings to avoid repeated array searches
 const RINGS_MAP = Object.fromEntries(RINGS.map(r => [r.key, r])) as Record<Ring, typeof RINGS[number]>;
 
 // SVG Layout Constants
@@ -59,6 +59,10 @@ const SCALE_FACTOR = 1.4; // Unified scale factor for both rings and item positi
 const QUADRANT_PADDING = 10;
 const LABEL_PADDING = 20;
 const BOTTOM_LABEL_OFFSET = 30;
+
+// Theme Color Constants
+const PRIMARY_COLOR = 'var(--primary)';
+const FOREGROUND_COLOR = 'var(--foreground)';
 
 export function TechRadar() {
   const [hoveredItem, setHoveredItem] = useState<TechItem | null>(null);
@@ -111,7 +115,7 @@ export function TechRadar() {
       </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col items-center justify-center relative min-h-[350px]" ref={containerRef}>
+      <CardContent className="flex-1 flex items-center justify-center relative min-h-[350px]" ref={containerRef}>
         {/* Radar SVG */}
         <svg viewBox={`0 0 ${VIEW_BOX_SIZE} ${VIEW_BOX_SIZE}`} className="w-full h-full max-w-[350px]">
           <title>Technology Radar</title>
@@ -160,8 +164,8 @@ export function TechRadar() {
 
           {/* 3. Quadrant Labels */}
           <g className="text-[10px] font-mono font-semibold fill-muted-foreground uppercase tracking-wider opacity-60">
-            <text x={VIEW_BOX_SIZE - LABEL_PADDING} y={CENTER} textAnchor="end">Languages</text>
-            <text x={LABEL_PADDING} y={CENTER} textAnchor="start">Platforms</text>
+            <text x={VIEW_BOX_SIZE - LABEL_PADDING} y={CENTER - BOTTOM_LABEL_OFFSET} textAnchor="end">Languages</text>
+            <text x={LABEL_PADDING} y={CENTER - BOTTOM_LABEL_OFFSET} textAnchor="start">Platforms</text>
             <text x={LABEL_PADDING} y={CENTER + BOTTOM_LABEL_OFFSET} textAnchor="start">Tools</text>
             <text x={VIEW_BOX_SIZE - LABEL_PADDING} y={CENTER + BOTTOM_LABEL_OFFSET} textAnchor="end">Techniques</text>
           </g>
@@ -189,22 +193,26 @@ export function TechRadar() {
                   scale: { duration: 0.3, ease: "easeOut" },
                   y: { duration: 0.3, ease: "easeOut" }
                 }}
-                onPointerEnter={() => setHoveredItem(item)}
-                onPointerLeave={() => setHoveredItem(null)}
-                onFocus={() => setFocusedItem(item)}
-                onBlur={() => setFocusedItem(null)}
-                onClick={() => setActiveItem(activeItem?.id === item.id ? null : item)}
-                className="cursor-pointer"
-                role="button"
-                tabIndex={0}
-                aria-label={`${item.name}: ${item.description || item.ring} adoption level`}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setActiveItem(activeItem?.id === item.id ? null : item);
-                  }
-                }}
               >
+                {/* Invisible focusable area for keyboard navigation */}
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r="10"
+                  fill="transparent"
+                  stroke="none"
+                  onFocus={() => setFocusedItem(item)}
+                  onBlur={() => setFocusedItem(null)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActiveItem(activeItem?.id === item.id ? null : item);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${item.name}: ${item.description || item.ring} adoption level`}
+                />
                 {/* Ping Animation for Adopted Tech */}
                 {item.ring === 'adopt' && !shouldReduceMotion && (
                   <motion.circle
@@ -229,10 +237,14 @@ export function TechRadar() {
                 <circle
                   cx={cx}
                   cy={cy}
-                  r="4"
+                  r="6"
                   fill={ringColor}
                   stroke="var(--background)"
                   strokeWidth="2"
+                  onPointerEnter={() => setHoveredItem(item)}
+                  onPointerLeave={() => setHoveredItem(null)}
+                  onClick={() => setActiveItem(activeItem?.id === item.id ? null : item)}
+                  className="cursor-pointer"
                 />
 
                 {/* Focus Ring */}
@@ -254,11 +266,13 @@ export function TechRadar() {
                   y={cy + 12}
                   textAnchor="middle"
                   className="text-[8px] font-medium fill-foreground"
-                  style={{ textShadow: '0 1px 4px color-mix(in srgb, var(--foreground) 80%, transparent)' }}
+                  style={{
+                    textShadow: '0 1px 4px color-mix(in srgb, var(--foreground) 80%, transparent), 0 1px 4px rgba(0, 0, 0, 0.5)'
+                  }}
                   animate={{
                     opacity: isHovered || isActive ? 1 : 0.4,
                     scale: isHovered || isActive ? 1.25 : 1,
-                    fill: isHovered || isActive ? 'var(--primary)' : 'var(--foreground)',
+                    fill: isHovered || isActive ? PRIMARY_COLOR : FOREGROUND_COLOR,
                   }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                 >
@@ -277,7 +291,7 @@ export function TechRadar() {
               animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
               exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="mt-4 w-full max-w-md"
+              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md"
             >
               <div className="bg-popover/90 backdrop-blur-md border border-border p-3 rounded-lg shadow-xl flex items-center justify-between">
                 <div className="space-y-1">
@@ -287,13 +301,14 @@ export function TechRadar() {
                       {tooltipItem.quadrant}
                     </Badge>
           </div>
-                  <p className="text-xs text-muted-foreground">{tooltipItem.description}</p>
+                  {tooltipItem.description && (
+                    <p className="text-xs text-muted-foreground">{tooltipItem.description}</p>
+                  )}
           </div>
                 <Badge
-                  className="capitalize"
+                  className="capitalize text-[var(--foreground)]"
                   style={{
-                    backgroundColor: RINGS_MAP[tooltipItem.ring]?.color,
-                    color: 'var(--foreground)'
+                    backgroundColor: RINGS_MAP[tooltipItem.ring]?.color
                   }}
                 >
                   {tooltipItem.ring}
