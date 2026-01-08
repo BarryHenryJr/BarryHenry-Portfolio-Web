@@ -7,21 +7,33 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup } from "@/components/ui/radio-group";
+import { CheckCircle2 } from "lucide-react";
 
 export function ContactForm() {
   const [showNotification, setShowNotification] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowNotification(true);
+    (e.target as HTMLFormElement).reset();
+  };
+
+  React.useEffect(() => {
+    if (showNotification) {
+      const timerId = setTimeout(() => {
+        setShowNotification(false);
+      }, 5000);
+
+      return () => clearTimeout(timerId);
+    }
+  }, [showNotification]);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Open a Ticket</CardTitle>
       </CardHeader>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          setShowNotification(true);
-          setTimeout(() => setShowNotification(false), 5000); // Hide after 5 seconds
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -73,18 +85,16 @@ export function ContactForm() {
       </form>
 
       {showNotification && (
-        <div className="mx-6 mb-6 p-4 bg-green-50 border border-green-200 rounded-md animate-in fade-in-0 duration-300">
+        <div className="mx-6 mb-6 p-4 bg-green-50 border border-green-200 rounded-md animate-in fade-in-0 duration-300 dark:bg-green-950 dark:border-green-800">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
+              <CheckCircle2 className="h-5 w-5 text-green-400" />
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-green-800">
+              <p className="text-sm font-medium text-green-800 dark:text-green-400">
                 Ticket submission coming soon!
               </p>
-              <p className="text-sm text-green-700 mt-1">
+              <p className="text-sm text-green-700 mt-1 dark:text-green-400">
                 Please use the direct contact links below for now.
               </p>
             </div>

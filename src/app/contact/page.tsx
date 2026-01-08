@@ -29,29 +29,15 @@ export default function ContactPage() {
               <CardTitle>System Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">Email</span>
+              {[{ name: "Email" }, { name: "GitHub" }, { name: "LinkedIn" }].map((item) => (
+                <div key={item.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">{item.name}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">Operational</span>
                 </div>
-                <span className="text-sm text-muted-foreground">Operational</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">GitHub</span>
-                </div>
-                <span className="text-sm text-muted-foreground">Operational</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">LinkedIn</span>
-                </div>
-                <span className="text-sm text-muted-foreground">Operational</span>
-              </div>
+              ))}
 
               <div className="flex items-center justify-between pt-2 border-t">
                 <span className="text-sm font-medium">Avg. Response Time</span>
