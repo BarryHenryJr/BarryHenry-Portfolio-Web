@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import { EXPERIENCE, PROJECTS, SOCIAL_LINKS, STACK } from "@/lib/constants";
 import { createClient, type RedisClientType } from "redis";
-import { RateLimiterRedis, type RateLimiterRes } from "rate-limiter-flexible";
 
 type MeStatus = "operational" | "open_to_work";
 
@@ -52,30 +51,39 @@ function getClientIp(request: NextRequest): string | null {
   return null;
 }
 
-function isRateLimiterRes(value: unknown): value is RateLimiterRes {
-  if (typeof value !== "object" || value == null) return false;
-  if (!("msBeforeNext" in value)) return false;
-
-  const msBeforeNext = (value as { msBeforeNext?: unknown }).msBeforeNext;
-  return typeof msBeforeNext === "number";
-}
 
 let redisClient: RedisClientType | null = null;
 let redisConnectPromise: Promise<void> | null = null;
-let rateLimiter: RateLimiterRedis | null = null;
-let anonymousRateLimiter: RateLimiterRedis | null = null;
 
-// Extend globalThis to include our cleanup interval
-declare global {
-  var redisCleanupInterval: NodeJS.Timeout | undefined;
+// Simple in-memory rate limiter for development/portfolio use
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
 }
 
-// Note: In serverless environments like Railway, Redis connections are managed
-// automatically by the platform and the redis package. We rely on Railway's
-// connection pooling and Redis's built-in timeouts rather than manual cleanup.
+const rateLimitStore = new Map<string, RateLimitEntry>();
+
+// Clean up expired entries periodically (every 5 minutes)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitStore.entries()) {
+    if (now > entry.resetTime) {
+      rateLimitStore.delete(key);
+    }
+  }
+}, 5 * 60 * 1000);
+
+
+// Note: In serverless environments (Vercel, Railway, etc.), each function invocation
+// may run in a fresh runtime, making global variables unreliable for caching.
+// The redis package handles connection pooling automatically, but cached clients
+// and rate limiters may not persist between invocations, potentially causing
+// reconnection overhead. This design prioritizes correctness over optimization
+// in serverless contexts where connection pooling benefits may be limited.
 
 async function getRedisClient(redisUrl: string): Promise<RedisClientType> {
-  if (redisClient == null) {
+  // Check if we have a client and if it's still in a valid connected state
+  if (redisClient == null || !redisClient.isOpen || !redisClient.isReady) {
     redisClient = createClient({
       url: redisUrl,
       socket: {
@@ -91,24 +99,22 @@ async function getRedisClient(redisUrl: string): Promise<RedisClientType> {
     });
 
     // Handle connection errors
-    redisClient.on('error', (err) => {
+    redisClient.on("error", (err) => {
       console.warn('Redis client error:', err.message);
     });
 
-    redisClient.on('connect', () => {
+    redisClient.on("connect", () => {
       console.log('Redis connected successfully');
     });
 
-    redisClient.on('ready', () => {
+    redisClient.on("ready", () => {
       console.log('Redis client ready');
     });
 
-    redisClient.on('end', () => {
+    redisClient.on("end", () => {
       console.log('Redis connection ended');
       redisClient = null;
       redisConnectPromise = null;
-      rateLimiter = null;
-      anonymousRateLimiter = null;
     });
   }
 
@@ -130,7 +136,7 @@ async function ensureRedisConnected(redisUrl: string): Promise<void> {
         // Log connection failure for debugging
         console.error('Redis connection failed:', {
           error: err instanceof Error ? err.message : String(err),
-          redisUrl: redisUrl.replace(/:[^:]*@/, ':***@'), // Mask password in logs
+          redisUrl: redisUrl.replace(/\/\/[^:]*:[^@]*@/, '//***:***@'), // Mask credentials in logs
           timestamp: new Date().toISOString()
         });
 
@@ -153,41 +159,30 @@ async function closeRedisConnection(): Promise<void> {
     } finally {
       redisClient = null;
       redisConnectPromise = null;
-      rateLimiter = null;
-      anonymousRateLimiter = null;
     }
   }
 }
 
-async function getRateLimiter(redisUrl: string, isAnonymous = false): Promise<RateLimiterRedis> {
-  if (isAnonymous) {
-    if (anonymousRateLimiter === null) {
-      // Ensure Redis connection is established before creating rate limiter
-      await ensureRedisConnected(redisUrl);
-      const client = await getRedisClient(redisUrl);
-      anonymousRateLimiter = new RateLimiterRedis({
-        storeClient: client,
-        keyPrefix: "public_api_me_anon",
-        points: 1,
-        duration: 60,
-      });
-    }
-    return anonymousRateLimiter;
+// Simple in-memory rate limiting function
+function checkRateLimitInMemory(key: string, maxRequests: number, windowMs: number): { allowed: boolean; resetTime?: number } {
+  const now = Date.now();
+  const entry = rateLimitStore.get(key);
+
+  if (!entry || now > entry.resetTime) {
+    // First request or expired window
+    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
+    return { allowed: true };
   }
 
-  if (rateLimiter === null) {
-    // Ensure Redis connection is established before creating rate limiter
-    await ensureRedisConnected(redisUrl);
-    const client = await getRedisClient(redisUrl);
-    rateLimiter = new RateLimiterRedis({
-      storeClient: client,
-      keyPrefix: "public_api_me",
-      points: 10,
-      duration: 60,
-    });
+  if (entry.count >= maxRequests) {
+    // Rate limit exceeded
+    return { allowed: false, resetTime: entry.resetTime };
   }
 
-  return rateLimiter;
+  // Increment counter
+  entry.count++;
+  rateLimitStore.set(key, entry);
+  return { allowed: true };
 }
 
 async function validateEnvironment(): Promise<{ success: false; response: NextResponse } | { success: true; env: { REDIS_URL: string } }> {
@@ -220,7 +215,7 @@ async function validateRedisConnection(redisUrl: string): Promise<{ success: fal
     // Log detailed error information for debugging
     console.error('Redis connection validation failed:', {
       error: error instanceof Error ? error.message : String(error),
-      redisUrl: redisUrl.replace(/:[^:]*@/, ':***@'), // Mask password in logs
+      redisUrl: redisUrl.replace(/\/\/[^:]*:[^@]*@/, '//***:***@'), // Mask credentials in logs
       timestamp: new Date().toISOString(),
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -246,51 +241,32 @@ async function validateRedisConnection(redisUrl: string): Promise<{ success: fal
   }
 }
 
-async function checkRateLimit(request: NextRequest, redisUrl: string): Promise<{ success: false; response: NextResponse } | { success: true }> {
+async function checkRateLimit(request: NextRequest): Promise<{ success: false; response: NextResponse } | { success: true }> {
   const headers = buildStandardHeaders();
 
   const ip = getClientIp(request);
   const isAnonymous = ip == null;
 
-  // For anonymous clients, skip rate limiting but log for monitoring
+  // Log anonymous client access for monitoring
   if (isAnonymous) {
-    console.info("Anonymous client access (no rate limiting):", {
+    console.info("Anonymous client access (applying strict rate limiting):", {
       userAgent: request.headers.get("user-agent") || "unknown",
       timestamp: new Date().toISOString(),
       path: request.nextUrl.pathname
     });
-    return { success: true };
   }
 
-  // For identified clients, apply normal rate limiting
-  try {
-    const limiter = await getRateLimiter(redisUrl, false);
+  // Use IP for identified clients, shared key for anonymous clients
+  const rateLimitKey = isAnonymous ? "anonymous_clients" : ip;
 
-    // Check if Redis client is still connected before using rate limiter
-    const client = await getRedisClient(redisUrl);
-    if (!client.isOpen || !client.isReady) {
-      console.warn("Redis client not ready for rate limiting, skipping");
-      return { success: true }; // Allow request but log the issue
-    }
+  // Apply rate limiting: 10 requests/minute for identified, 1 request/minute for anonymous
+  const maxRequests = isAnonymous ? 1 : 10;
+  const windowMs = 60 * 1000; // 1 minute
 
-    await limiter.consume(ip);
-    return { success: true };
-  } catch (error: unknown) {
-    if (!isRateLimiterRes(error)) {
-      console.error("Unexpected error during rate limiting:", {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-        redisUrl: redisUrl.replace(/:[^:]*@/, ':***@'), // Mask password in logs
-        timestamp: new Date().toISOString()
-      });
+  const result = checkRateLimitInMemory(rateLimitKey, maxRequests, windowMs);
 
-      // If rate limiting fails due to Redis issues, allow the request
-      // This prevents the API from being completely unusable due to rate limiting problems
-      console.warn("Rate limiting failed, allowing request to proceed");
-      return { success: true };
-    }
-
-    const retryAfterSeconds = Math.max(0, Math.ceil(error.msBeforeNext / 1000));
+  if (!result.allowed) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((result.resetTime! - Date.now()) / 1000));
     headers.set("Retry-After", retryAfterSeconds.toString());
 
     return {
@@ -301,6 +277,8 @@ async function checkRateLimit(request: NextRequest, redisUrl: string): Promise<{
       )
     };
   }
+
+  return { success: true };
 }
 
 function validateServerData(): { success: false; response: NextResponse } | { success: true } {
@@ -330,7 +308,19 @@ function validateServerData(): { success: false; response: NextResponse } | { su
 }
 
 function prepareResponseData(): { payload: unknown } {
-  const title = EXPERIENCE[0].role;
+  // Validate that the first experience exists and has required properties
+  const firstExperience = EXPERIENCE[0];
+  if (!firstExperience || typeof firstExperience !== 'object' || !('role' in firstExperience)) {
+    throw new Error('Server misconfigured: First experience entry is invalid or missing role property');
+  }
+  const title = firstExperience.role;
+
+  // Validate that the first project exists and is a valid object
+  const latestProject = PROJECTS[0];
+  if (!latestProject || typeof latestProject !== 'object') {
+    throw new Error('Server misconfigured: First project entry is invalid');
+  }
+
   const stack = STACK.filter((item) => item.proficiency === "Expert").map(
     (item) => item.name
   );
@@ -340,7 +330,7 @@ function prepareResponseData(): { payload: unknown } {
     status: STATUS,
     title,
     stack,
-    latest_project: PROJECTS[0],
+    latest_project: latestProject,
     contact: SOCIAL_LINKS,
     documentation: DOCUMENTATION_URL,
   };
@@ -362,7 +352,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   if (!redisResult.success) return redisResult.response;
 
   // Check rate limit
-  const rateLimitResult = await checkRateLimit(request, envResult.env.REDIS_URL);
+  const rateLimitResult = await checkRateLimit(request);
   if (!rateLimitResult.success) return rateLimitResult.response;
 
   // Prepare response data (validation already done above)
@@ -383,7 +373,7 @@ export async function OPTIONS(request: NextRequest): Promise<NextResponse> {
     });
 
     if (envValidation.success) {
-      const rateLimitResult = await checkRateLimit(request, envValidation.data.REDIS_URL);
+      const rateLimitResult = await checkRateLimit(request);
       if (!rateLimitResult.success) {
         return rateLimitResult.response;
       }
