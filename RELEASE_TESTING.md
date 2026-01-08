@@ -23,7 +23,7 @@ Three test scripts are available:
 
 #### 1. Test Release-Please Logic
 ```bash
-npm run test:release-please
+pnpm run test:release-please
 ```
 or
 ```bash
@@ -37,7 +37,7 @@ This script:
 
 #### 2. Test Version Badge Update
 ```bash
-npm run test:version-badge
+pnpm run test:version-badge
 ```
 or
 ```bash
@@ -51,7 +51,7 @@ This script:
 
 #### 3. Run Both Tests
 ```bash
-npm run release:local
+pnpm run release:local
 ```
 
 ### What Gets Tested
@@ -102,14 +102,17 @@ release-please manifest \
 1. **Make your changes** with conventional commit messages
 2. **Run local tests**:
    ```bash
-   npm run release:local
+   pnpm run release:local
    ```
 3. **Verify results** - check the output for expected behavior
 4. **Create PR** with conventional commit messages
 
 ### After PR Approval (Before Merge)
 
-1. **Run tests again** to ensure everything is ready
+1. **Run tests again** to ensure everything is ready:
+   ```bash
+   pnpm run release:local
+   ```
 2. **Merge the PR** to main
 3. **Monitor the CI/CD pipeline** for:
    - Build completion
