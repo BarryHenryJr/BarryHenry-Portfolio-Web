@@ -22,8 +22,8 @@ try {
   console.log('📋 Current state:');
   console.log(`   Package version: ${pkg.version}`);
 
-  // Find current version badge
-  const versionBadgeRegex = /!\[version\]\(https:\/\/img\.shields\.io\/badge\/version-[^-]+-blue\)/;
+  // Find current version badge (supports various colors and formats)
+  const versionBadgeRegex = /!\[version\]\(https:\/\/img\.shields\.io\/badge\/version-[^)]+\)/;
   const currentBadgeMatch = readme.match(versionBadgeRegex);
 
   if (currentBadgeMatch) {

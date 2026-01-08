@@ -51,13 +51,14 @@ try {
       const commitMessage = commitMessageMatch[1];
 
       // Check for conventional commit patterns at the start of the message
-      const isConventionalCommit = /^(\w+)(\([^)]+\))?!?:/.test(commitMessage);
-      if (isConventionalCommit) {
-        const type = commitMessage.match(/^(\w+)(\([^)]+\))?!?:/)?.[1];
+      // Matches: type, type(scope), type!, type(scope)!
+      const conventionalMatch = commitMessage.match(/^(\w+)(\([^)]+\))?(!)?:/);
+      if (conventionalMatch) {
+        const [, type, , isBreaking] = conventionalMatch;
         if (type === 'feat') hasFeatures = true;
         if (type === 'fix') hasFixes = true;
         // Check for breaking change indicator (!) in the type part
-        if (commitMessage.match(/^\w+(\([^)]+\))?!:/)) {
+        if (isBreaking) {
           hasBreaking = true;
         }
       }
