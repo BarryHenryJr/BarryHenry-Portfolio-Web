@@ -78,16 +78,7 @@ if (typeof globalThis !== 'undefined' && !globalThis.redisCleanupInterval) {
   globalThis.redisCleanupInterval = setInterval(async () => {
     const now = Date.now();
     if (redisClient && (now - lastActivity) > CONNECTION_TIMEOUT) {
-      try {
-        await redisClient.quit();
-      } catch (cleanupError) {
-        console.warn('Redis periodic cleanup failed:', cleanupError instanceof Error ? cleanupError.message : String(cleanupError));
-      } finally {
-        redisClient = null;
-        redisConnectPromise = null;
-        rateLimiter = null;
-        anonymousRateLimiter = null;
-      }
+      await closeRedisConnection();
     }
   }, CLEANUP_INTERVAL);
 
@@ -178,16 +169,7 @@ async function ensureRedisConnected(redisUrl: string): Promise<void> {
           timestamp: new Date().toISOString()
         });
 
-        redisConnectPromise = null;
-        // Try to cleanup on connection failure
-        try {
-          await client.quit();
-        } catch (cleanupError) {
-          console.warn('Redis cleanup failed:', cleanupError instanceof Error ? cleanupError.message : String(cleanupError));
-        }
-        redisClient = null;
-        rateLimiter = null;
-        anonymousRateLimiter = null;
+        await closeRedisConnection();
         rejectConnection(err);
       });
   }
@@ -212,28 +194,30 @@ async function closeRedisConnection(): Promise<void> {
 }
 
 async function getRateLimiter(redisUrl: string, isAnonymous = false): Promise<RateLimiterRedis> {
-  const config = isAnonymous
-    ? { limiter: anonymousRateLimiter, keyPrefix: "public_api_me_anon", points: 1 }
-    : { limiter: rateLimiter, keyPrefix: "public_api_me", points: 10 };
-
-  if (config.limiter == null) {
-    const client = await getRedisClient(redisUrl);
-    config.limiter = new RateLimiterRedis({
-      storeClient: client,
-      keyPrefix: config.keyPrefix,
-      points: config.points,
-      duration: 60,
-    });
-
-    // Update the global reference
-    if (isAnonymous) {
-      anonymousRateLimiter = config.limiter;
-    } else {
-      rateLimiter = config.limiter;
+  if (isAnonymous) {
+    if (anonymousRateLimiter === null) {
+      const client = await getRedisClient(redisUrl);
+      anonymousRateLimiter = new RateLimiterRedis({
+        storeClient: client,
+        keyPrefix: "public_api_me_anon",
+        points: 1,
+        duration: 60,
+      });
     }
+    return anonymousRateLimiter;
   }
 
-  return config.limiter;
+  if (rateLimiter === null) {
+    const client = await getRedisClient(redisUrl);
+    rateLimiter = new RateLimiterRedis({
+      storeClient: client,
+      keyPrefix: "public_api_me",
+      points: 10,
+      duration: 60,
+    });
+  }
+
+  return rateLimiter;
 }
 
 async function validateEnvironment(): Promise<{ success: false; response: NextResponse } | { success: true; env: { REDIS_URL: string } }> {
@@ -308,6 +292,7 @@ async function checkRateLimit(request: NextRequest, redisUrl: string): Promise<{
     return { success: true };
   } catch (error: unknown) {
     if (!isRateLimiterRes(error)) {
+      console.error("Unexpected error during rate limiting:", error);
       return {
         success: false,
         response: NextResponse.json(
