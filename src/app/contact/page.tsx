@@ -32,7 +32,11 @@ export default function ContactPage() {
               {[{ name: "Email" }, { name: "GitHub" }, { name: "LinkedIn" }].map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div
+                      className="w-2 h-2 bg-green-500 rounded-full"
+                      aria-label={`${item.name} status: Operational`}
+                      role="status"
+                    ></div>
                     <span className="text-sm">{item.name}</span>
                   </div>
                   <span className="text-sm text-muted-foreground">Operational</span>

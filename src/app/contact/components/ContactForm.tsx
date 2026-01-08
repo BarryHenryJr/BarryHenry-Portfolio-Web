@@ -11,9 +11,11 @@ import { CheckCircle2 } from "lucide-react";
 
 export function ContactForm() {
   const [showNotification, setShowNotification] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     setShowNotification(true);
     (e.target as HTMLFormElement).reset();
   };
@@ -22,6 +24,7 @@ export function ContactForm() {
     if (showNotification) {
       const timerId = setTimeout(() => {
         setShowNotification(false);
+        setIsSubmitting(false);
       }, 5000);
 
       return () => clearTimeout(timerId);
@@ -33,6 +36,7 @@ export function ContactForm() {
       <CardHeader>
         <CardTitle>Open a Ticket</CardTitle>
       </CardHeader>
+      {/* TODO: Add CSRF protection and rate limiting when implementing actual form submission */}
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -78,14 +82,18 @@ export function ContactForm() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
-            Submit Ticket
+          <Button type="submit" className="w-full" disabled={isSubmitting || showNotification}>
+            {isSubmitting ? "Submitting..." : "Submit Ticket"}
           </Button>
         </CardFooter>
       </form>
 
       {showNotification && (
-        <div className="mx-6 mb-6 p-4 bg-green-50 border border-green-200 rounded-md animate-in fade-in-0 duration-300 dark:bg-green-950 dark:border-green-800">
+        <div
+          className="mx-6 mb-6 p-4 bg-green-50 border border-green-200 rounded-md animate-in fade-in-0 duration-300 dark:bg-green-950 dark:border-green-800"
+          role="status"
+          aria-live="polite"
+        >
           <div className="flex">
             <div className="flex-shrink-0">
               <CheckCircle2 className="h-5 w-5 text-green-400" />
