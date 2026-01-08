@@ -1,56 +1,168 @@
-import { Activity } from "lucide-react";
+import { Activity, AlertCircle, GitCommit, Rocket } from "lucide-react";
+
+import { PROJECTS } from "@/lib/constants";
+
+type EventType = "code" | "deploy" | "system";
+
+type Event = {
+  id: string;
+  type: EventType;
+  title: string;
+  detail?: string;
+  /** Age in milliseconds (how long ago the event occurred) */
+  ageMs: number;
+};
+
+function formatRelativeAge(ageMs: number): string {
+  if (ageMs < 0) return "0ms";
+  if (ageMs < 1000) return `${Math.max(0, Math.round(ageMs))}ms`;
+
+  const seconds = Math.floor(ageMs / 1000);
+  if (seconds < 60) return `${seconds}s`;
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+const EVENT_META: Record<
+  EventType,
+  {
+    Icon: typeof GitCommit;
+    iconLabel: string;
+    iconClassName: string;
+    nodeClassName: string;
+  }
+> = {
+  code: {
+    Icon: GitCommit,
+    iconLabel: "Code event",
+    iconClassName: "text-emerald-500",
+    nodeClassName: "border-emerald-500/30 bg-emerald-500/10",
+  },
+  deploy: {
+    Icon: Rocket,
+    iconLabel: "Deployment event",
+    iconClassName: "text-sky-500",
+    nodeClassName: "border-sky-500/30 bg-sky-500/10",
+  },
+  system: {
+    Icon: AlertCircle,
+    iconLabel: "System event",
+    iconClassName: "text-amber-500",
+    nodeClassName: "border-amber-500/30 bg-amber-500/10",
+  },
+};
 
 export function ActivityFeed() {
+  const deployEvents: Event[] = PROJECTS.filter(
+    (p) => p.status !== "archived"
+  ).map((project, index) => {
+    const ageMs = (index + 2) * 60 * 60 * 1000; // 2h, 3h, 4h...
+
+    return {
+      id: `deploy-${project.id}`,
+      type: "deploy",
+      title: `Deployed ${project.title}`,
+      detail: `Status: ${project.status}`,
+      ageMs,
+    };
+  });
+
+  const firstDeploy = deployEvents[0];
+  const remainingDeploys = deployEvents.slice(1);
+
+  const events: Event[] = [
+    {
+      id: "commit-1",
+      type: "code",
+      title: "feat(dashboard): add System Events feed",
+      detail: "commit 7f3a2c1",
+      ageMs: 12 * 60 * 1000,
+    },
+    ...(firstDeploy == null ? [] : [firstDeploy]),
+    {
+      id: "system-1",
+      type: "system",
+      title: "Rate limit thresholds optimized",
+      detail: "redis-backed limiter tuned",
+      ageMs: 14,
+    },
+    {
+      id: "commit-2",
+      type: "code",
+      title: "fix(api): harden client IP detection",
+      detail: "commit b91d8e0",
+      ageMs: 46 * 60 * 1000,
+    },
+    ...remainingDeploys,
+    {
+      id: "system-2",
+      type: "system",
+      title: "Cache purged",
+      detail: "stale artifacts removed",
+      ageMs: 6 * 60 * 60 * 1000,
+    },
+  ];
+
   return (
     <div className="rounded-lg border border-border bg-card p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Activity className="h-5 w-5 text-muted-foreground" />
-        <h3 className="text-lg font-semibold text-card-foreground">Recent Activity</h3>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <Activity className="h-5 w-5 text-muted-foreground" />
+          <h3 className="text-lg font-semibold text-card-foreground">
+            System Events
+          </h3>
+        </div>
+        <span className="text-xs font-mono text-muted-foreground">git log</span>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex items-center gap-3 p-3 rounded-md bg-muted/50 border border-border">
-          <div
-            className="h-2 w-2 rounded-full bg-green-500"
-            role="img"
-            aria-label="Active status"
-          >
-            <span className="sr-only">Active</span>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm text-card-foreground">Portfolio updated</p>
-            <p className="text-xs text-muted-foreground">2 hours ago</p>
-          </div>
-        </div>
+      <ul className="space-y-0" aria-label="System events feed">
+        {events.map((event, index) => {
+          const isLast = index === events.length - 1;
+          const meta = EVENT_META[event.type];
 
-        <div className="flex items-center gap-3 p-3 rounded-md bg-muted/50 border border-border">
-          <div
-            className="h-2 w-2 rounded-full bg-blue-500"
-            role="img"
-            aria-label="Deployed status"
-          >
-            <span className="sr-only">Deployed</span>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm text-card-foreground">New project deployed</p>
-            <p className="text-xs text-muted-foreground">1 day ago</p>
-          </div>
-        </div>
+          return (
+            <li key={event.id} className="relative pl-10 pb-4 last:pb-0">
+              {!isLast ? (
+                <div
+                  className="absolute left-3 top-7 bottom-0 w-px bg-border"
+                  aria-hidden="true"
+                />
+              ) : null}
 
-        <div className="flex items-center gap-3 p-3 rounded-md bg-muted/50 border border-border">
-          <div
-            className="h-2 w-2 rounded-full bg-yellow-500"
-            role="img"
-            aria-label="Completed status"
-          >
-            <span className="sr-only">Completed</span>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm text-card-foreground">Skill assessment completed</p>
-            <p className="text-xs text-muted-foreground">3 days ago</p>
-          </div>
-        </div>
-      </div>
+              <div
+                className={`absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border ${meta.nodeClassName}`}
+                role="img"
+                aria-label={meta.iconLabel}
+              >
+                <meta.Icon className={`h-3.5 w-3.5 ${meta.iconClassName}`} />
+              </div>
+
+              <div className="rounded-md border border-border bg-muted/30 px-3 py-2">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm font-medium text-card-foreground">
+                    {event.title}
+                  </p>
+                  <span className="shrink-0 text-xs font-mono text-muted-foreground">
+                    {formatRelativeAge(event.ageMs)}
+                  </span>
+                </div>
+                {event.detail == null ? null : (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {event.detail}
+                  </p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
