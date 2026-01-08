@@ -11,7 +11,7 @@ const STATUS: MeStatus = "operational";
 const DOCUMENTATION_URL = "https://barryhenry.com/docs";
 
 const envSchema = z.object({
-  REDIS_URL: z.string().min(1).url(),
+  REDIS_URL: z.string().url().optional(),
 });
 
 function buildStandardHeaders(): Headers {
@@ -163,6 +163,45 @@ async function closeRedisConnection(): Promise<void> {
   }
 }
 
+// Redis-based rate limiting function
+async function checkRateLimitRedis(key: string, maxRequests: number, windowMs: number): Promise<{ allowed: boolean; resetTime?: number }> {
+  try {
+    const client = await getRedisClient(process.env.REDIS_URL!);
+    if (!client.isOpen) {
+      throw new Error('Redis client not connected');
+    }
+
+    const now = Date.now();
+    const windowStart = now - windowMs;
+
+    // Use Redis sorted set to track requests within the time window
+    const redisKey = `ratelimit:${key}`;
+
+    // Remove old entries outside the window
+    await client.zRemRangeByScore(redisKey, 0, windowStart);
+
+    // Count current requests in window
+    const currentCount = await client.zCard(redisKey);
+
+    if (currentCount >= maxRequests) {
+      // Rate limit exceeded - return reset time as current time + window
+      return { allowed: false, resetTime: now + windowMs };
+    }
+
+    // Add current request timestamp
+    await client.zAdd(redisKey, { score: now, value: `${now}-${Math.random()}` });
+
+    // Set expiration on the key (cleanup old windows)
+    await client.expire(redisKey, Math.ceil(windowMs / 1000) * 2);
+
+    return { allowed: true };
+  } catch (error) {
+    console.warn('Redis rate limiting failed, falling back to in-memory:', error);
+    // Fallback to in-memory rate limiting if Redis fails
+    return checkRateLimitInMemory(key, maxRequests, windowMs);
+  }
+}
+
 // Simple in-memory rate limiting function
 function checkRateLimitInMemory(key: string, maxRequests: number, windowMs: number): { allowed: boolean; resetTime?: number } {
   const now = Date.now();
@@ -185,18 +224,17 @@ function checkRateLimitInMemory(key: string, maxRequests: number, windowMs: numb
   return { allowed: true };
 }
 
-async function validateEnvironment(): Promise<{ success: false; response: NextResponse } | { success: true; env: { REDIS_URL: string } }> {
-  const headers = buildStandardHeaders();
-
+async function validateEnvironment(): Promise<{ success: false; response: NextResponse } | { success: true; env: { REDIS_URL?: string } }> {
   const envValidation = envSchema.safeParse({
-    REDIS_URL: process.env.REDIS_URL,
+    REDIS_URL: process.env.REDIS_URL || undefined,
   });
 
   if (!envValidation.success) {
+    const headers = buildStandardHeaders();
     return {
       success: false,
       response: NextResponse.json(
-        { error: "Server misconfigured: REDIS_URL not set" },
+        { error: "Server misconfigured: REDIS_URL invalid" },
         { status: 500, headers }
       )
     };
@@ -205,12 +243,18 @@ async function validateEnvironment(): Promise<{ success: false; response: NextRe
   return { success: true, env: envValidation.data };
 }
 
-async function validateRedisConnection(redisUrl: string): Promise<{ success: false; response: NextResponse } | { success: true }> {
+async function validateRedisConnection(redisUrl?: string): Promise<{ success: false; response: NextResponse } | { success: true; redisAvailable: boolean }> {
+  // If no Redis URL is provided, skip Redis validation and use in-memory rate limiting
+  if (!redisUrl) {
+    console.log('Redis URL not provided, using in-memory rate limiting');
+    return { success: true, redisAvailable: false };
+  }
+
   const headers = buildStandardHeaders();
 
   try {
     await ensureRedisConnected(redisUrl);
-    return { success: true };
+    return { success: true, redisAvailable: true };
   } catch (error) {
     // Log detailed error information for debugging
     console.error('Redis connection validation failed:', {
@@ -241,7 +285,7 @@ async function validateRedisConnection(redisUrl: string): Promise<{ success: fal
   }
 }
 
-async function checkRateLimit(request: NextRequest): Promise<{ success: false; response: NextResponse } | { success: true }> {
+async function checkRateLimit(request: NextRequest, redisAvailable: boolean): Promise<{ success: false; response: NextResponse } | { success: true }> {
   const headers = buildStandardHeaders();
 
   const ip = getClientIp(request);
@@ -263,7 +307,10 @@ async function checkRateLimit(request: NextRequest): Promise<{ success: false; r
   const maxRequests = isAnonymous ? 1 : 10;
   const windowMs = 60 * 1000; // 1 minute
 
-  const result = checkRateLimitInMemory(rateLimitKey, maxRequests, windowMs);
+  // Use Redis-based rate limiting if available, otherwise fall back to in-memory
+  const result = redisAvailable
+    ? await checkRateLimitRedis(rateLimitKey, maxRequests, windowMs)
+    : checkRateLimitInMemory(rateLimitKey, maxRequests, windowMs);
 
   if (!result.allowed) {
     const retryAfterSeconds = Math.max(1, Math.ceil((result.resetTime! - Date.now()) / 1000));
@@ -347,12 +394,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const dataValidation = validateServerData();
   if (!dataValidation.success) return dataValidation.response;
 
-  // Validate Redis connection (expensive operation)
+  // Validate Redis connection (expensive operation, optional)
   const redisResult = await validateRedisConnection(envResult.env.REDIS_URL);
   if (!redisResult.success) return redisResult.response;
 
-  // Check rate limit
-  const rateLimitResult = await checkRateLimit(request);
+  // Apply rate limiting (uses Redis when available, otherwise in-memory)
+  const rateLimitResult = await checkRateLimit(request, redisResult.redisAvailable);
   if (!rateLimitResult.success) return rateLimitResult.response;
 
   // Prepare response data (validation already done above)
@@ -366,19 +413,19 @@ export async function OPTIONS(request: NextRequest): Promise<NextResponse> {
   const headers = buildStandardHeaders();
 
   // Apply rate limiting to OPTIONS requests to prevent abuse
-  // Note: This requires REDIS_URL to be available at runtime
+  // Note: Uses Redis if available, otherwise uses in-memory rate limiting
   try {
-    const envValidation = envSchema.safeParse({
-      REDIS_URL: process.env.REDIS_URL,
-    });
-
-    if (envValidation.success) {
-      const rateLimitResult = await checkRateLimit(request);
-      if (!rateLimitResult.success) {
-        return rateLimitResult.response;
-      }
+    // Check if Redis is available for rate limiting
+    let redisAvailable = false;
+    if (process.env.REDIS_URL) {
+      const redisResult = await validateRedisConnection(process.env.REDIS_URL);
+      redisAvailable = redisResult.success && redisResult.redisAvailable;
     }
-    // If Redis is not configured, allow OPTIONS requests to prevent CORS issues
+
+    const rateLimitResult = await checkRateLimit(request, redisAvailable);
+    if (!rateLimitResult.success) {
+      return rateLimitResult.response;
+    }
   } catch {
     // If rate limiting fails, still allow OPTIONS to prevent blocking legitimate CORS preflights
   }
