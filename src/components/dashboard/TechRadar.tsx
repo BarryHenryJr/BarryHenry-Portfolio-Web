@@ -15,7 +15,7 @@ type TechItem = {
   name: string;
   quadrant: Quadrant;
   ring: Ring;
-  x: number; // coordinates (-65 to 70) for optimal visual distribution
+  x: number; // coordinates (x: -65 to 70, y: -60 to 70) for optimal visual distribution
   y: number;
   description?: string;
 };
@@ -42,11 +42,16 @@ const TECH_ITEMS: TechItem[] = [
 ];
 
 // --- Visual Helpers ---
+/**
+ * Ring configuration with CSS custom properties for chart colors.
+ * Requires theme definition of --chart-1 through --chart-4 variables.
+ * Falls back to semantic colors if variables are undefined.
+ */
 const RINGS = [
-  { key: 'adopt' as const, radius: 30, color: 'var(--chart-1)', label: 'Adopt' },
-  { key: 'trial' as const, radius: 55, color: 'var(--chart-2)', label: 'Trial' },
-  { key: 'assess' as const, radius: 80, color: 'var(--chart-3)', label: 'Assess' },
-  { key: 'hold' as const, radius: 100, color: 'var(--chart-4)', label: 'Hold' },
+  { key: 'adopt' as const, radius: 30, color: 'var(--chart-1, hsl(221.2 83.2% 53.3%))', label: 'Adopt' },
+  { key: 'trial' as const, radius: 55, color: 'var(--chart-2, hsl(142.1 76.2% 36.3%))', label: 'Trial' },
+  { key: 'assess' as const, radius: 80, color: 'var(--chart-3, hsl(47.9 95.8% 53.1%))', label: 'Assess' },
+  { key: 'hold' as const, radius: 100, color: 'var(--chart-4, hsl(0 84.2% 60.2%))', label: 'Hold' },
 ] as const;
 
 // Lookup map for rings to avoid repeated array searches
@@ -60,9 +65,7 @@ const QUADRANT_PADDING = 10;
 const LABEL_PADDING = 20;
 const BOTTOM_LABEL_OFFSET = 30;
 
-// Theme Color Constants
-const PRIMARY_COLOR = 'var(--primary)';
-const FOREGROUND_COLOR = 'var(--foreground)';
+// Theme Color Constants (removed - no longer used after fixing animation compatibility)
 
 export function TechRadar() {
   const [hoveredItem, setHoveredItem] = useState<TechItem | null>(null);
@@ -92,8 +95,23 @@ export function TechRadar() {
   // Prioritizes hovered items over active items for tooltip display
   const tooltipItem = hoveredItem ?? activeItem;
 
+  // Determine tooltip position based on item location to avoid overlapping
+  // Items with y > 0 are in bottom quadrants (tools/techniques), so position tooltip above
+  // Items with y <= 0 are in top quadrants (languages/platforms), so position tooltip below
+  const isItemInBottomHalf = tooltipItem ? tooltipItem.y > 0 : false;
+  const tooltipPositionClasses = isItemInBottomHalf
+    ? "absolute top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md" // Position above radar
+    : "absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md"; // Position below radar
+
+  /**
+   * Note: This component uses overflow-visible to allow the technology details
+   * tooltip panel to extend beyond the card boundaries for better UX. Parent
+   * containers should account for ~16px of bottom overflow when this component
+   * is used in layouts with strict overflow handling.
+   */
   return (
     <Card className="h-full flex flex-col overflow-visible">
+      {/* overflow-visible required for tooltip panel that extends below card boundaries */}
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -182,7 +200,8 @@ export function TechRadar() {
             return (
               <motion.g
                 key={item.id}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
+                // No initial entrance animation - items appear immediately on mount to avoid jarring entrance effects
+                // Only animate on user interactions (hover/active states) for better UX
                 animate={shouldReduceMotion ? { opacity: isDimmed ? 0.3 : 1 } : {
                   opacity: isDimmed ? 0.3 : 1,
                   scale: isHovered || isActive ? 1.2 : 1,
@@ -267,12 +286,14 @@ export function TechRadar() {
                   textAnchor="middle"
                   className="text-[8px] font-medium fill-foreground"
                   style={{
-                    textShadow: '0 1px 4px color-mix(in srgb, var(--foreground) 80%, transparent), 0 1px 4px rgba(0, 0, 0, 0.5)'
+                    // Layered text shadow for readability - using rgba for cross-browser compatibility
+                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.5)'
                   }}
                   animate={{
                     opacity: isHovered || isActive ? 1 : 0.4,
                     scale: isHovered || isActive ? 1.25 : 1,
-                    fill: isHovered || isActive ? PRIMARY_COLOR : FOREGROUND_COLOR,
+                    // Note: fill color animation removed due to CSS variable interpolation issues with Framer Motion
+                    // Text color is handled by CSS class 'fill-foreground' for consistent theming
                   }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                 >
@@ -287,13 +308,23 @@ export function TechRadar() {
         <AnimatePresence>
           {tooltipItem && (
             <motion.div
-              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
+              initial={shouldReduceMotion ? { opacity: 0 } : {
+                opacity: 0,
+                y: isItemInBottomHalf ? -10 : 10,
+                scale: 0.95
+              }}
               animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : {
+                opacity: 0,
+                y: isItemInBottomHalf ? -10 : 10,
+                scale: 0.95
+              }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md"
+              className={tooltipPositionClasses}
             >
-              <div className="bg-popover/90 backdrop-blur-md border border-border p-3 rounded-lg shadow-xl flex items-center justify-between">
+              <div className={`bg-popover/90 border border-border p-3 rounded-lg shadow-xl flex items-center justify-between ${
+                shouldReduceMotion ? '' : 'backdrop-blur-md' // Conditional backdrop-blur for performance with reduced motion
+              }`}>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-popover-foreground">{tooltipItem.name}</span>
@@ -306,7 +337,7 @@ export function TechRadar() {
                   )}
           </div>
                 <Badge
-                  className="capitalize text-[var(--foreground)]"
+                  className="capitalize text-white" // White text for high contrast against dynamic ring colors
                   style={{
                     backgroundColor: RINGS_MAP[tooltipItem.ring]?.color
                   }}
