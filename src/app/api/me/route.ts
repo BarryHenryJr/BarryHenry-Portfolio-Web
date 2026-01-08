@@ -11,7 +11,7 @@ const STATUS: MeStatus = "operational";
 const DOCUMENTATION_URL = "https://barryhenry.com/docs";
 
 const envSchema = z.object({
-  REDIS_URL: z.string().min(1).url(),
+  REDIS_URL: z.string().min(1).url().optional(),
 });
 
 function buildStandardHeaders(): Headers {
@@ -66,11 +66,13 @@ const rateLimitStore = new Map<string, RateLimitEntry>();
 // Clean up expired entries periodically (every 5 minutes)
 setInterval(() => {
   const now = Date.now();
-  for (const [key, entry] of rateLimitStore.entries()) {
+  const keysToDelete: string[] = [];
+  Array.from(rateLimitStore.entries()).forEach(([key, entry]) => {
     if (now > entry.resetTime) {
-      rateLimitStore.delete(key);
+      keysToDelete.push(key);
     }
-  }
+  });
+  keysToDelete.forEach(key => rateLimitStore.delete(key));
 }, 5 * 60 * 1000);
 
 
@@ -185,18 +187,17 @@ function checkRateLimitInMemory(key: string, maxRequests: number, windowMs: numb
   return { allowed: true };
 }
 
-async function validateEnvironment(): Promise<{ success: false; response: NextResponse } | { success: true; env: { REDIS_URL: string } }> {
-  const headers = buildStandardHeaders();
-
+async function validateEnvironment(): Promise<{ success: false; response: NextResponse } | { success: true; env: { REDIS_URL?: string } }> {
   const envValidation = envSchema.safeParse({
     REDIS_URL: process.env.REDIS_URL,
   });
 
   if (!envValidation.success) {
+    const headers = buildStandardHeaders();
     return {
       success: false,
       response: NextResponse.json(
-        { error: "Server misconfigured: REDIS_URL not set" },
+        { error: "Server misconfigured: REDIS_URL invalid" },
         { status: 500, headers }
       )
     };
@@ -205,12 +206,18 @@ async function validateEnvironment(): Promise<{ success: false; response: NextRe
   return { success: true, env: envValidation.data };
 }
 
-async function validateRedisConnection(redisUrl: string): Promise<{ success: false; response: NextResponse } | { success: true }> {
+async function validateRedisConnection(redisUrl?: string): Promise<{ success: false; response: NextResponse } | { success: true; redisAvailable: boolean }> {
+  // If no Redis URL is provided, skip Redis validation and use in-memory rate limiting
+  if (!redisUrl) {
+    console.log('Redis URL not provided, using in-memory rate limiting');
+    return { success: true, redisAvailable: false };
+  }
+
   const headers = buildStandardHeaders();
 
   try {
     await ensureRedisConnected(redisUrl);
-    return { success: true };
+    return { success: true, redisAvailable: true };
   } catch (error) {
     // Log detailed error information for debugging
     console.error('Redis connection validation failed:', {
@@ -347,13 +354,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const dataValidation = validateServerData();
   if (!dataValidation.success) return dataValidation.response;
 
-  // Validate Redis connection (expensive operation)
+  // Validate Redis connection (expensive operation, optional)
   const redisResult = await validateRedisConnection(envResult.env.REDIS_URL);
   if (!redisResult.success) return redisResult.response;
 
-  // Check rate limit
-  const rateLimitResult = await checkRateLimit(request);
-  if (!rateLimitResult.success) return rateLimitResult.response;
+  // Check rate limit (only if we have Redis available, otherwise skip for development)
+  if (redisResult.redisAvailable) {
+    const rateLimitResult = await checkRateLimit(request);
+    if (!rateLimitResult.success) return rateLimitResult.response;
+  } else {
+    console.log('Skipping rate limiting - Redis not available');
+  }
 
   // Prepare response data (validation already done above)
   const dataResult = prepareResponseData();
@@ -366,7 +377,7 @@ export async function OPTIONS(request: NextRequest): Promise<NextResponse> {
   const headers = buildStandardHeaders();
 
   // Apply rate limiting to OPTIONS requests to prevent abuse
-  // Note: This requires REDIS_URL to be available at runtime
+  // Note: Uses Redis if available, otherwise rate limiting is skipped
   try {
     const envValidation = envSchema.safeParse({
       REDIS_URL: process.env.REDIS_URL,

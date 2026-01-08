@@ -10,7 +10,7 @@
     "prepare": "husky",
     "test:release-please": "node scripts/test-release-please.js",
     "test:version-badge": "node scripts/test-version-badge.js",
-    "release:local": "npm run test:release-please && npm run test:version-badge"
+    "release:local": "npm run test:release-please "npm run test:release-please && npm run test:version-badge","npm run test:release-please && npm run test:version-badge", npm run test:version-badge"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
