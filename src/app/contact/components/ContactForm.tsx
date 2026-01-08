@@ -1,13 +1,15 @@
 "use client";
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { RadioGroup } from "@/components/ui/radio-group";
 
 export function ContactForm() {
+  const [showNotification, setShowNotification] = useState(false);
   return (
     <Card>
       <CardHeader>
@@ -16,7 +18,8 @@ export function ContactForm() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          alert("Ticket submission functionality coming soon! Please use the direct contact links below.");
+          setShowNotification(true);
+          setTimeout(() => setShowNotification(false), 5000); // Hide after 5 seconds
         }}
       >
         <CardContent className="space-y-6">
@@ -41,50 +44,15 @@ export function ContactForm() {
             />
           </div>
 
-          <fieldset className="space-y-3">
-            <legend className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Priority
-            </legend>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="priority-low"
-                  name="priority"
-                  value="low"
-                  className="h-4 w-4 text-primary focus:ring-primary border-border"
-                />
-                <Label htmlFor="priority-low" className="text-sm">
-                  Low
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="priority-medium"
-                  name="priority"
-                  value="medium"
-                  className="h-4 w-4 text-primary focus:ring-primary border-border"
-                  defaultChecked
-                />
-                <Label htmlFor="priority-medium" className="text-sm">
-                  Medium
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="priority-high"
-                  name="priority"
-                  value="high"
-                  className="h-4 w-4 text-primary focus:ring-primary border-border"
-                />
-                <Label htmlFor="priority-high" className="text-sm">
-                  High
-                </Label>
-              </div>
-            </div>
-          </fieldset>
+          <RadioGroup
+            name="priority"
+            legend="Priority"
+            options={[
+              { id: "priority-low", label: "Low", value: "low" },
+              { id: "priority-medium", label: "Medium", value: "medium", defaultChecked: true },
+              { id: "priority-high", label: "High", value: "high" }
+            ]}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="message">Message</Label>
@@ -97,12 +65,32 @@ export function ContactForm() {
             />
           </div>
         </CardContent>
-        <div className="px-6 pb-6">
+        <CardFooter>
           <Button type="submit" className="w-full">
             Submit Ticket
           </Button>
-        </div>
+        </CardFooter>
       </form>
+
+      {showNotification && (
+        <div className="mx-6 mb-6 p-4 bg-green-50 border border-green-200 rounded-md animate-in fade-in-0 duration-300">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-green-800">
+                Ticket submission coming soon!
+              </p>
+              <p className="text-sm text-green-700 mt-1">
+                Please use the direct contact links below for now.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

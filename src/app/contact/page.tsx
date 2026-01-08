@@ -10,7 +10,7 @@ export default function ContactPage() {
     <div className="space-y-8 animate-in fade-in-0 duration-500">
       {/* Page Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Support</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Contact</h1>
         <p className="text-muted-foreground">
           Submit a ticket or check channel status.
         </p>
@@ -56,7 +56,7 @@ export default function ContactPage() {
               <div className="flex items-center justify-between pt-2 border-t">
                 <span className="text-sm font-medium">Avg. Response Time</span>
                 <Badge variant="secondary" className="text-green-600 bg-green-50 border-green-200 dark:text-green-400 dark:bg-green-950 dark:border-green-800">
-                  2-4 hours
+                  4-8 hours
                 </Badge>
               </div>
             </CardContent>
