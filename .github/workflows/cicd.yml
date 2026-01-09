@@ -154,7 +154,6 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: write
-      pull-requests: write
     timeout-minutes: 10
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
