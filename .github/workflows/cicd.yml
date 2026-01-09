@@ -191,6 +191,19 @@ jobs:
           const fs = require('fs');
           const readme = fs.readFileSync('README.md', 'utf8');
           const version = process.env.VERSION;
+
+          // Extract current version from badge
+          const currentBadgeMatch = readme.match(/!\[version\]\(https:\/\/img\.shields\.io\/badge\/version-([^-]+)-blue\)/);
+          const currentBadgeVersion = currentBadgeMatch ? currentBadgeMatch[1] : null;
+
+          console.log(\`Current badge version: \${currentBadgeVersion}\`);
+          console.log(\`Package version: \${version}\`);
+
+          if (currentBadgeVersion === version) {
+            console.log('Version badge is already up to date');
+            process.exit(0);
+          }
+
           const oldBadgePattern = /!\[version\]\(https:\/\/img\.shields\.io\/badge\/version-[^-]+-blue\)/;
           const newBadge = \`![version](https://img.shields.io/badge/version-\${version}-blue)\`;
 
