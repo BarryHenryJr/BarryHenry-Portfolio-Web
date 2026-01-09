@@ -154,6 +154,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: write
+      pull-requests: write
     timeout-minutes: 10
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
@@ -163,13 +164,12 @@ jobs:
         id: release
         uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
   update-version-badge:
     name: Update Version Badge
     runs-on: ubuntu-latest
-    needs: [release-please]
-    if: needs.release-please.outputs.release_created == 'true'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: write
     timeout-minutes: 10
@@ -177,7 +177,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
       - name: Get version from package.json
         id: get_version
@@ -191,6 +191,19 @@ jobs:
           const fs = require('fs');
           const readme = fs.readFileSync('README.md', 'utf8');
           const version = process.env.VERSION;
+
+          // Extract current version from badge
+          const currentBadgeMatch = readme.match(/!\[version\]\(https:\/\/img\.shields\.io\/badge\/version-([^-]+)-blue\)/);
+          const currentBadgeVersion = currentBadgeMatch ? currentBadgeMatch[1] : null;
+
+          console.log(\`Current badge version: \${currentBadgeVersion}\`);
+          console.log(\`Package version: \${version}\`);
+
+          if (currentBadgeVersion === version) {
+            console.log('Version badge is already up to date');
+            process.exit(0);
+          }
+
           const oldBadgePattern = /!\[version\]\(https:\/\/img\.shields\.io\/badge\/version-[^-]+-blue\)/;
           const newBadge = \`![version](https://img.shields.io/badge/version-\${version}-blue)\`;
 

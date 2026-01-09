@@ -7,8 +7,7 @@
       "package-name": "barryhenry-portfolio-web",
       "bump-minor-pre-major": true,
       "prerelease": false,
-      "draft": false,
-      "pull-request": false
+      "draft": false
     }
   }
 }
