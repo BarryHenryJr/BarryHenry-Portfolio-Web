@@ -10,6 +10,8 @@ import {
 // Content source of truth: Barry's master resume. Only add facts that appear there;
 // never invent roles, metrics, or links (private repos must not be linked).
 
+export const SITE_URL = "https://www.barryhenry.com";
+
 export const PROFILE = {
   name: "Barry Henry",
   headline: "Solutions Engineer & Full-Stack Developer",

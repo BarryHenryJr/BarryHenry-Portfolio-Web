@@ -14,6 +14,7 @@ import { PrintButton } from "./components/PrintButton";
 export const metadata: Metadata = {
   title: "Resume",
   description: `Resume of ${PROFILE.name}, ${PROFILE.headline}.`,
+  alternates: { canonical: "/resume" },
 };
 
 const SKILL_CATEGORIES: StackCategory[] = [

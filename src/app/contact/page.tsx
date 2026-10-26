@@ -1,9 +1,16 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FileText, Github, Linkedin, Mail } from "lucide-react";
 import { PROFILE, SOCIAL_LINKS } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Get in touch with Barry Henry by email, LinkedIn or GitHub.",
+  alternates: { canonical: "/contact" },
+};
 
 const CHANNELS = [
   {

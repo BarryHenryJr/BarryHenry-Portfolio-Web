@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import { PROJECTS, type ProjectStatus } from "@/lib/constants";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,12 @@ import {
   Sprout,
 } from "lucide-react";
 import { AnimatedGrid } from "./components/AnimatedGrid";
+
+export const metadata: Metadata = {
+  title: "Projects",
+  description: "Products Barry Henry designs and builds end to end: Happy Harvest, TelemetryTaco, How Cara Lost Her Color, Happy Scheduler and more.",
+  alternates: { canonical: "/projects" },
+};
 
 // Type-safe mapping of valid project icon names to components
 const PROJECT_ICONS = {
