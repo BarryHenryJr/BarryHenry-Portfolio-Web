@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FileText, Github, Linkedin, Mail, MapPin } from "lucide-react";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { RecentCommits } from "@/components/dashboard/RecentCommits";
 import { TechRadar } from "@/components/dashboard/TechRadar";
 import { Button } from "@/components/ui/button";
 import { METRICS, PROFILE, SOCIAL_LINKS } from "@/lib/constants";
@@ -80,6 +81,8 @@ export default function OverviewPage() {
           <TechRadar />
         </div>
       </div>
+
+      <RecentCommits />
     </div>
   );
 }
