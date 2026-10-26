@@ -85,7 +85,7 @@ export default function ResumePage() {
 
         <section className="space-y-3">
           <SectionHeading>Engineering projects</SectionHeading>
-          {PROJECTS.map((project) => (
+          {PROJECTS.filter((project) => project.kind === "personal").map((project) => (
             <div key={project.id} className="break-inside-avoid text-sm print:text-[11px]">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <h3 className="font-semibold">

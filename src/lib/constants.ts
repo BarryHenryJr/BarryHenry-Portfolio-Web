@@ -103,12 +103,15 @@ export type ProjectIcon =
   | "Sprout"
   | "BookOpen"
   | "CalendarClock"
-  | "Search";
+  | "Search"
+  | "Landmark";
 
 export type ProjectStatus = "live" | "open source" | "in development" | "internal";
 
 export interface Project {
   id: string;
+  /** "work" projects were built on the job and are already covered by the resume's experience section */
+  kind: "personal" | "work";
   title: string;
   role: string;
   period: string;
@@ -126,6 +129,7 @@ export interface Project {
 export const PROJECTS: Project[] = [
   {
     id: "happy-harvest",
+    kind: "personal",
     title: "Happy Harvest",
     role: "Founder & Lead Engineer",
     period: "Apr 2025 – Present",
@@ -143,7 +147,27 @@ export const PROJECTS: Project[] = [
     repo: null,
   },
   {
+    id: "banking-tools",
+    kind: "work",
+    title: "Banking ops tooling",
+    role: "Cook Solutions Group",
+    period: "2017 – Present",
+    description:
+      "Tools I built on the job to fix customer problems at financial institutions right away, until the product team shipped permanent fixes.",
+    highlights: [
+      "C# tool that detects, hashes and redacts PII in logs from legacy third-party applications.",
+      "Python middleware routing ATM XML/TIF transaction data to vendor APIs for automated credit union deposits.",
+      "Real-time status dashboard for 35+ Vidyo components; PowerShell install, TLS and network-test automation.",
+    ],
+    icon: "Landmark",
+    status: "internal",
+    tech: ["C#", "Python", "PowerShell", "Azure", "REST & SOAP APIs"],
+    href: null,
+    repo: null,
+  },
+  {
     id: "telemetry-taco",
+    kind: "personal",
     title: "TelemetryTaco",
     role: "Creator",
     period: "Dec 2025 – Present",
@@ -162,6 +186,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "cara",
+    kind: "personal",
     title: "How Cara Lost Her Color",
     role: "Publishing & Engineering Lead",
     period: "Jan 2024 – Present",
@@ -180,6 +205,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "happy-scheduler",
+    kind: "personal",
     title: "Happy Scheduler",
     role: "Creator",
     period: "2026 – Present",
@@ -198,6 +224,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "job-hunter",
+    kind: "personal",
     title: "Job Hunter",
     role: "Personal project",
     period: "2026",
@@ -215,6 +242,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "portfolio",
+    kind: "personal",
     title: "This portfolio",
     role: "Designer & Developer",
     period: "Jan 2026",
