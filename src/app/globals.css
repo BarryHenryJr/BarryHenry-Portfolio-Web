@@ -123,3 +123,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Resume "Download PDF" uses the print dialog. Top/bottom margins come from @page so they
+   repeat on every page; side margins are padding on the content, so they hold even when the
+   dialog's Margins setting is "None" (which overrides @page). */
+@page {
+  size: letter;
+  margin: 0.5in 0;
+}
+
+@media print {
+  html,
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

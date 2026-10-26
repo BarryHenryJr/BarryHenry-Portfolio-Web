@@ -238,8 +238,11 @@ export function TechRadar() {
                     r={8}
                     fill={ringColor}
                     opacity={0.3}
+                    // Animate scale rather than the r attribute: framer-motion writes r as an
+                    // unset value on some frames, which logs SVG errors in the console
+                    style={{ transformBox: "fill-box", transformOrigin: "center" }}
                     animate={{
-                      r: [3, 12, 3],
+                      scale: [0.4, 1.5, 0.4],
                       opacity: [0.3, 0, 0.3],
                     }}
                     transition={{

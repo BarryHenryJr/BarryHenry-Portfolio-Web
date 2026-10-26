@@ -7,8 +7,8 @@ import { createClient, type RedisClientType } from "redis";
 type MeStatus = "operational" | "open_to_work";
 
 const NAME = "Barry Henry";
-const STATUS: MeStatus = "operational";
-const DOCUMENTATION_URL = "https://barryhenry.com/docs";
+const STATUS: MeStatus = "open_to_work";
+const DOCUMENTATION_URL = "https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web";
 
 const envSchema = z.object({
   REDIS_URL: z.string().url().optional(),
@@ -368,7 +368,7 @@ function prepareResponseData(): { payload: unknown } {
     throw new Error('Server misconfigured: First project entry is invalid');
   }
 
-  const stack = STACK.filter((item) => item.proficiency === "Expert").map(
+  const stack = STACK.filter((item) => item.category !== "Banking & Security").map(
     (item) => item.name
   );
 

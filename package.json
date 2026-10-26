@@ -1,6 +1,6 @@
 {
   "name": "barryhenry-portfolio-web",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
@@ -26,6 +26,7 @@
     "lucide-react": "^0.562.0",
     "next": "16.4.3",
     "next-themes": "^0.4.6",
+    "posthog-js": "^1.438.23",
     "rate-limiter-flexible": "^9.0.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",

@@ -13,14 +13,16 @@ import {
   Database,
   Cloud,
   Container,
-  PenTool,
-  Image,
   GitBranch,
   Code,
   Send,
-  Package
+  Package,
+  Terminal,
+  Shield,
+  Smartphone,
+  Landmark,
 } from "lucide-react";
-import { StackItem, StackCategory, StackIconName } from "@/lib/constants";
+import { StackItem, StackCategory, StackContext, StackIconName } from "@/lib/constants";
 
 // Type-safe mapping of valid stack icon names to components
 const STACK_ICONS: Record<StackIconName, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
@@ -32,12 +34,14 @@ const STACK_ICONS: Record<StackIconName, React.ComponentType<React.SVGProps<SVGS
   Database,
   Cloud,
   Container,
-  PenTool,
-  Image,
   GitBranch,
   Code,
   Send,
   Package,
+  Terminal,
+  Shield,
+  Smartphone,
+  Landmark,
 } as const;
 
 interface StackGroup {
@@ -69,15 +73,11 @@ const itemVariants: Variants = {
 };
 
 // Badge variant mapping - defined outside function to prevent recreation on every call
-const PROFICIENCY_VARIANT_MAP: Record<StackItem['proficiency'], 'default' | 'secondary' | 'outline'> = {
-  'Expert': 'default',
-  'Advanced': 'secondary',
-  'Intermediate': 'outline',
+const CONTEXT_VARIANT_MAP: Record<StackContext, 'default' | 'secondary' | 'outline'> = {
+  'Work + Projects': 'default',
+  'Work': 'secondary',
+  'Projects': 'outline',
 };
-
-function getBadgeVariant(proficiency: StackItem['proficiency']) {
-  return PROFICIENCY_VARIANT_MAP[proficiency] ?? 'outline';
-}
 
 interface StackCardProps {
   item: StackItem;
@@ -95,15 +95,15 @@ function StackCard({ item }: StackCardProps) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
             <IconComponent className="h-4 w-4 text-muted-foreground" />
           </div>
-          <h3 className="font-semibold text-sm">{item.name}</h3>
+          <h3 className="font-semibold text-sm leading-tight">{item.name}</h3>
         </div>
 
-        {/* Row 2: Proficiency Badge */}
-        <Badge variant={getBadgeVariant(item.proficiency)} className="w-fit">
-          {item.proficiency}
+        {/* Row 2: Where it was used */}
+        <Badge variant={CONTEXT_VARIANT_MAP[item.context]} className="w-fit">
+          {item.context}
         </Badge>
 
-        {/* Row 3: Tiny description */}
+        {/* Row 3: Evidence - the roles or projects that used it */}
         <p className="text-xs text-muted-foreground leading-relaxed">
           {item.description}
         </p>
@@ -123,7 +123,7 @@ export function StackGrid({ groups }: StackGridProps) {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-2 gap-4 md:grid-cols-4"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
           >
             {group.items.map((item) => (
               <motion.div

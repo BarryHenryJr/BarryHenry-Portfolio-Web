@@ -1,40 +1,44 @@
 import React from "react";
-import { PROJECTS } from "@/lib/constants";
+import type { Metadata } from "next";
+import { PROJECTS, type ProjectStatus } from "@/lib/constants";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, Package, LayoutDashboard, BarChart3 } from "lucide-react";
+import {
+  BarChart3,
+  BookOpen,
+  CalendarClock,
+  ExternalLink,
+  Github,
+  LayoutDashboard,
+  Lock,
+  Search,
+  Sprout,
+} from "lucide-react";
 import { AnimatedGrid } from "./components/AnimatedGrid";
+
+export const metadata: Metadata = {
+  title: "Projects",
+  description: "Products Barry Henry designs and builds end to end: Happy Harvest, TelemetryTaco, How Cara Lost Her Color, Happy Scheduler and more.",
+  alternates: { canonical: "/projects" },
+};
 
 // Type-safe mapping of valid project icon names to components
 const PROJECT_ICONS = {
   LayoutDashboard,
   BarChart3,
+  Sprout,
+  BookOpen,
+  CalendarClock,
+  Search,
 } as const;
 
-interface ProjectLinkButtonProps {
-  href: string;
-  variant?: "default" | "ghost";
-  children: React.ReactNode;
-}
-
-function ProjectLinkButton({ href, variant = "default", children }: ProjectLinkButtonProps) {
-  if (href !== "#") {
-    return (
-      <Button size="sm" variant={variant} className="flex-1" asChild>
-        <a href={href} target="_blank" rel="noopener noreferrer">
-          {children}
-        </a>
-      </Button>
-    );
-  }
-
-  return (
-    <Button size="sm" variant={variant} className="flex-1" disabled>
-      {children}
-    </Button>
-  );
-}
+const STATUS_CLASS: Record<ProjectStatus, string> = {
+  "live": "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400",
+  "open source": "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400",
+  "in development": "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  "internal": "border-border bg-muted text-muted-foreground",
+};
 
 export default function ProjectsPage() {
   return (
@@ -42,27 +46,33 @@ export default function ProjectsPage() {
       {/* Page Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-        <p className="text-muted-foreground">
-          Manage your installed integrations and active developments.
+        <p className="text-muted-foreground max-w-3xl">
+          Products I design and build end to end, mostly through Agile-Flimflam, a small builders&apos; collective I
+          co-founded in 2021. Most repos are private; TelemetryTaco and this site are public.
         </p>
       </div>
 
       {/* Projects Grid */}
       <AnimatedGrid>
         {PROJECTS.map((project) => {
-          // Type-safe icon lookup with fallback
-          const IconComponent = PROJECT_ICONS[project.icon] || Package;
+          const IconComponent = PROJECT_ICONS[project.icon];
 
           return (
             <Card key={project.id} className="h-full flex flex-col">
               <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                     <IconComponent className="h-5 w-5 text-muted-foreground" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{project.title}</h3>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="font-semibold leading-tight">{project.title}</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {project.role} · {project.period}
+                    </p>
                   </div>
+                  <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${STATUS_CLASS[project.status]}`}>
+                    {project.status}
+                  </span>
                 </div>
               </CardHeader>
 
@@ -71,8 +81,15 @@ export default function ProjectsPage() {
                   {project.description}
                 </p>
 
+                <ul className="list-disc pl-4 space-y-1">
+                  {project.highlights.map((highlight, index) => (
+                    <li key={`${project.id}-hl-${index}`} className="text-xs text-muted-foreground leading-relaxed">
+                      {highlight}
+                    </li>
+                  ))}
+                </ul>
+
                 <div className="mt-auto space-y-3">
-                  {/* Tech Stack Badges */}
                   <div className="flex flex-wrap gap-1">
                     {project.tech.map((tech, index) => (
                       <Badge key={`${tech}-${index}`} variant="secondary" className="text-xs">
@@ -81,18 +98,31 @@ export default function ProjectsPage() {
                     ))}
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <ProjectLinkButton href={project.href}>
-                      <ExternalLink className="h-3 w-3" />
-                      Install
-                    </ProjectLinkButton>
-
-                    <ProjectLinkButton href={project.repo} variant="ghost">
-                      <Github className="h-3 w-3" />
-                      View Source
-                    </ProjectLinkButton>
-                  </div>
+                  {project.href == null && project.repo == null ? (
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Lock className="h-3 w-3" aria-hidden="true" />
+                      Private repo; happy to walk through it on a call.
+                    </p>
+                  ) : (
+                    <div className="flex gap-2">
+                      {project.href != null && (
+                        <Button size="sm" className="flex-1" asChild>
+                          <a href={project.href} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3 w-3" />
+                            Visit site
+                          </a>
+                        </Button>
+                      )}
+                      {project.repo != null && (
+                        <Button size="sm" variant="outline" className="flex-1" asChild>
+                          <a href={project.repo} target="_blank" rel="noopener noreferrer">
+                            <Github className="h-3 w-3" />
+                            View source
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
