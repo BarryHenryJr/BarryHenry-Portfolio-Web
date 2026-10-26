@@ -123,3 +123,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Resume "Download PDF" uses the print dialog: give every printed page real margins
+   (some browsers default to none, which puts text at the paper edge) and print light-on-white. */
+@page {
+  size: letter;
+  margin: 0.5in 0.6in;
+}
+
+@media print {
+  html,
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
