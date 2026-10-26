@@ -43,7 +43,7 @@ export default function ResumePage() {
         <PrintButton />
       </div>
 
-      <article className="mx-auto max-w-4xl space-y-6 rounded-lg border border-border bg-card p-6 text-card-foreground sm:p-10 print:max-w-none print:rounded-none print:border-0 print:bg-white print:p-0 print:text-black print:text-[11px] print:space-y-3">
+      <article className="mx-auto max-w-4xl space-y-6 rounded-lg border border-border bg-card p-6 text-card-foreground sm:p-10 print:max-w-none print:rounded-none print:border-0 print:bg-white print:px-[0.6in] print:py-0 print:text-black print:text-[11px] print:space-y-3">
         <header className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight print:text-2xl">{PROFILE.name}</h1>
           <p className="text-lg text-muted-foreground print:text-sm print:text-black">{PROFILE.headline}</p>
