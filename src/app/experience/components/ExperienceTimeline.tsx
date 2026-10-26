@@ -61,15 +61,21 @@ export function ExperienceTimeline({ items }: ExperienceTimelineProps) {
                   {item.version}
                 </Badge>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg">{item.company}</h3>
+                  <h2 className="font-semibold text-lg">{item.company}</h2>
                   <p className="font-semibold text-muted-foreground">{item.role}</p>
                 </div>
               </div>
-              <p className="text-muted-foreground text-sm">{item.period}</p>
+              <p className="text-muted-foreground text-sm">
+                {item.period}
+                {item.location != null && ` · ${item.location}`}
+              </p>
+              {item.summary != null && (
+                <p className="text-sm text-muted-foreground">{item.summary}</p>
+              )}
             </CardHeader>
 
             <CardContent className="pb-4">
-              <ul className="list-disc list-inside space-y-1">
+              <ul className="list-disc pl-5 space-y-1">
                 {item.description.map((desc, descIndex) => (
                   <li key={`${item.id}-desc-${descIndex}`} className="text-sm text-muted-foreground">
                     {desc}
