@@ -9,7 +9,7 @@ export default function ExperiencePage() {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Experience</h1>
         <p className="text-muted-foreground">
-          A chronological history of my professional experience and career milestones.
+          Ten years in banking technology, built on earlier careers in bank branch management and security systems.
         </p>
       </div>
 
