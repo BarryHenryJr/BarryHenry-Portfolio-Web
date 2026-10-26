@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { PROJECTS, type ProjectStatus } from "@/lib/constants";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -8,8 +9,10 @@ import {
   BarChart3,
   BookOpen,
   CalendarClock,
+  ArrowRight,
   ExternalLink,
   Github,
+  Landmark,
   LayoutDashboard,
   Lock,
   Search,
@@ -31,13 +34,14 @@ const PROJECT_ICONS = {
   BookOpen,
   CalendarClock,
   Search,
+  Landmark,
 } as const;
 
 const STATUS_CLASS: Record<ProjectStatus, string> = {
   "live": "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400",
   "open source": "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400",
   "in development": "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  "internal": "border-border bg-muted text-muted-foreground",
+  "internal": "border-border bg-muted text-foreground/80",
 };
 
 export default function ProjectsPage() {
@@ -48,7 +52,8 @@ export default function ProjectsPage() {
         <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
         <p className="text-muted-foreground max-w-3xl">
           Products I design and build end to end, mostly through Agile-Flimflam, a small builders&apos; collective I
-          co-founded in 2021. Most repos are private; TelemetryTaco and this site are public.
+          co-founded in 2021, plus the tools I&apos;ve built on the job in banking technology. Most code is private;
+          TelemetryTaco and this site are public. Open any project for the full case study.
         </p>
       </div>
 
@@ -65,7 +70,11 @@ export default function ProjectsPage() {
                     <IconComponent className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h2 className="font-semibold leading-tight">{project.title}</h2>
+                    <h2 className="font-semibold leading-tight">
+                      <Link href={`/projects/${project.id}`} className="hover:underline">
+                        {project.title}
+                      </Link>
+                    </h2>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {project.role} · {project.period}
                     </p>
@@ -98,10 +107,17 @@ export default function ProjectsPage() {
                     ))}
                   </div>
 
+                  <Button size="sm" variant="secondary" className="w-full" asChild>
+                    <Link href={`/projects/${project.id}`}>
+                      Read case study
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+
                   {project.href == null && project.repo == null ? (
                     <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Lock className="h-3 w-3" aria-hidden="true" />
-                      Private repo; happy to walk through it on a call.
+                      Private code; happy to walk through it on a call.
                     </p>
                   ) : (
                     <div className="flex gap-2">
