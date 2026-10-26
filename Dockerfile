@@ -1,7 +1,7 @@
 FROM node:20-slim
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm (pinned to match CI and packageManager; unpinned installs pull breaking majors)
+RUN npm install -g pnpm@9.15.0
 
 # Set working directory
 WORKDIR /app
