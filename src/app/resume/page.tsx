@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
 import {
-  CERTIFICATIONS,
   EDUCATION,
-  EXPERIENCE,
   PROFILE,
   PROJECTS,
+  SITE_URL,
   SOCIAL_LINKS,
   STACK,
   type StackCategory,
 } from "@/lib/constants";
+import {
+  RESUME_CERTIFICATIONS,
+  RESUME_EARLIER_CAREER,
+  RESUME_OTHER,
+  RESUME_PROJECT_IDS,
+  RESUME_ROLES,
+} from "@/lib/resume";
 import { PrintButton } from "./components/PrintButton";
 
 export const metadata: Metadata = {
@@ -25,6 +31,8 @@ const SKILL_CATEGORIES: StackCategory[] = [
   "Integrations",
   "Banking & Security",
 ];
+
+const RESUME_PROJECTS = PROJECTS.filter((project) => RESUME_PROJECT_IDS.includes(project.id));
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
@@ -44,7 +52,7 @@ export default function ResumePage() {
         <PrintButton />
       </div>
 
-      <article className="mx-auto max-w-4xl space-y-6 rounded-lg border border-border bg-card p-6 text-card-foreground sm:p-10 print:max-w-none print:rounded-none print:border-0 print:bg-white print:px-[0.6in] print:py-0 print:text-black print:text-[11px] print:space-y-3">
+      <article className="mx-auto max-w-4xl space-y-6 rounded-lg border border-border bg-card p-6 text-card-foreground sm:p-10 print:max-w-none print:rounded-none print:border-0 print:bg-white print:px-[0.6in] print:py-0 print:text-black print:text-[11px] print:space-y-2">
         <header className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight print:text-2xl">{PROFILE.name}</h1>
           <p className="text-lg text-muted-foreground print:text-sm print:text-black">{PROFILE.headline}</p>
@@ -61,31 +69,39 @@ export default function ResumePage() {
           <p className="text-sm leading-relaxed print:text-[11px]">{PROFILE.summary}</p>
         </section>
 
-        <section className="space-y-3">
+        <section className="space-y-3 print:space-y-1.5">
           <SectionHeading>Experience</SectionHeading>
-          {EXPERIENCE.map((job) => (
+          {RESUME_ROLES.map((job) => (
             <div key={job.id} className="space-y-1 break-inside-avoid">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <h3 className="font-semibold">
                   {job.role} · <span className="font-normal">{job.company}</span>
                 </h3>
-                <span className="text-xs text-muted-foreground print:text-black">
-                  {job.period}
-                  {job.location != null && ` · ${job.location}`}
-                </span>
+                <span className="text-xs text-muted-foreground print:text-black">{job.period}</span>
               </div>
               <ul className="list-disc space-y-0.5 pl-5 text-sm print:text-[11px]">
-                {job.description.map((line, index) => (
+                {job.points.map((line, index) => (
                   <li key={`${job.id}-${index}`}>{line}</li>
                 ))}
               </ul>
             </div>
           ))}
+          <div className="space-y-1 break-inside-avoid text-sm print:text-[11px]">
+            {RESUME_OTHER.map((item) => (
+              <div key={item.id} className="flex items-baseline justify-between gap-x-3">
+                <p className="min-w-0">
+                  <span className="font-semibold">{item.role}</span> · {item.company}: {item.detail}
+                </p>
+                <span className="shrink-0 text-xs text-muted-foreground print:text-black">{item.period}</span>
+              </div>
+            ))}
+            <p className="text-muted-foreground print:text-black">{RESUME_EARLIER_CAREER}</p>
+          </div>
         </section>
 
-        <section className="space-y-3">
+        <section className="space-y-3 print:space-y-1.5">
           <SectionHeading>Engineering projects</SectionHeading>
-          {PROJECTS.filter((project) => project.kind === "personal").map((project) => (
+          {RESUME_PROJECTS.map((project) => (
             <div key={project.id} className="break-inside-avoid text-sm print:text-[11px]">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <h3 className="font-semibold">
@@ -94,7 +110,10 @@ export default function ResumePage() {
                 <span className="text-xs text-muted-foreground print:text-black">{project.period}</span>
               </div>
               <p>
-                {project.description} <span className="text-muted-foreground print:text-black">({project.tech.join(", ")})</span>
+                {project.description} <span className="text-muted-foreground print:text-black">({project.tech.join(", ")})</span>{" "}
+                <a href={`/projects/${project.id}`} className="text-muted-foreground underline print:text-black">
+                  {SITE_URL.replace("https://", "")}/projects/{project.id}
+                </a>
               </p>
             </div>
           ))}
@@ -116,7 +135,7 @@ export default function ResumePage() {
           <section className="space-y-2 break-inside-avoid">
             <SectionHeading>Certifications</SectionHeading>
             <ul className="space-y-0.5 text-sm print:text-[11px]">
-              {CERTIFICATIONS.map((cert) => (
+              {RESUME_CERTIFICATIONS.map((cert) => (
                 <li key={cert}>{cert}</li>
               ))}
             </ul>
@@ -135,6 +154,11 @@ export default function ResumePage() {
             </ul>
           </section>
         </div>
+
+        <p className="border-t border-border pt-3 text-center text-sm text-muted-foreground print:border-black print:text-[11px] print:text-black">
+          Full resume with references available on request:{" "}
+          <a href={`mailto:${SOCIAL_LINKS.email}`} className="hover:underline">{SOCIAL_LINKS.email}</a>
+        </p>
       </article>
     </div>
   );
