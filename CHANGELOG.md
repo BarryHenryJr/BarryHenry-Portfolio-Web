@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/compare/barryhenry-portfolio-web-v0.2.0...barryhenry-portfolio-web-v0.3.0) (2026-10-27)
+
+
+### Features
+
+* **overview:** show latest commits from public repos ([#32](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/issues/32)) ([c671597](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/commit/c6715970fa4a72bb1091517e17ec0c1ca6e6a3b0))
+* **resume:** make the public resume a one-page teaser ([#34](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/issues/34)) ([40f196e](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/commit/40f196eb9db506add16d5abf192551e2bba8a27f))
+
 ## [0.2.0](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/compare/barryhenry-portfolio-web-v0.1.2...barryhenry-portfolio-web-v0.2.0) (2026-10-26)
 
 
