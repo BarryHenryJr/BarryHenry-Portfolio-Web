@@ -1,264 +1,177 @@
+<div align="center">
+
+# Barry Henry
+
+**Solutions Engineer & Full-Stack Developer** · Maui, Hawaiʻi · Open to new roles
+
+A decade of leading banking technology rollouts, plus full-stack products I design, build and ship myself.
+
+[**View the live site →**](https://www.barryhenry.com) &nbsp;·&nbsp; [Resume](https://www.barryhenry.com/resume) &nbsp;·&nbsp; [Projects](https://www.barryhenry.com/projects) &nbsp;·&nbsp; [Get in touch](https://www.barryhenry.com/contact)
+
 ![version](https://img.shields.io/badge/version-0.4.0-blue)
-![build](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main)
-![lint](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main&job=lint)
-![security](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main&job=security-audit)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black?logo=next.js&logoColor=white)
-![React](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-20.18.0-339933?logo=node.js&logoColor=white)
-![pnpm](https://img.shields.io/badge/pnpm-9.15.0-F69220?logo=pnpm&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38bdf8?logo=tailwind-css&logoColor=white)
+[![CI/CD](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main)](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml)
+![Next.js](https://img.shields.io/badge/Next.js-16.4-black?logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwind-css&logoColor=white)
+![Deployed on Railway](https://img.shields.io/badge/deployed_on-Railway-0B0D0E?logo=railway&logoColor=white)
 
-# Barry Henry - Portfolio
+</div>
 
-A modern, high-fidelity personal portfolio designed to mimic a SaaS dashboard. Built with cutting-edge technologies and featuring real-time metrics, interactive components, and a seamless user experience.
+---
 
-## ✨ Features
+## Who I am, in 30 seconds
 
-### Dashboard Overview
+I sit where customers, sales and engineering meet. At Cook Solutions Group I join qualified pre-sales calls for demos, discovery, scoping and RFP responses, then own the implementation through go-live. I've led **100+ NCR Interactive Teller Machine** rollouts and **80+ check imaging** rollouts for community banks and credit unions nationwide, and I build the C#, Python and PowerShell tools that fix customer problems before the permanent product fix ships.
 
-- **Activity Feed** - Real-time activity tracking and metrics
-- **Tech Radar** - Interactive technology proficiency visualization
-- **Project Metrics** - Live statistics on active projects, skills, and experience
+Outside work I build full-stack products end to end with **TypeScript, React, Next.js, Node.js, Python and PostgreSQL**, from the data model to CI/CD to production hosting.
 
-### Portfolio Showcase
+**What I bring to a team or a client:**
 
-- **Projects Grid** - Animated grid layout showcasing featured projects with status indicators
-- **Experience Timeline** - Changelog-style professional experience visualization
-- **Project Details** - Comprehensive project information with tech stacks and links
+- **Technical discovery that turns into a working system.** I scope it, design it, stand up the infrastructure and stay through go-live.
+- **Full-stack delivery.** Mobile, web, APIs, queues, databases, Docker and deploy pipelines, shipped by one person.
+- **Calm in regulated environments.** Years of work inside financial institutions, where security, uptime and compliance are not optional.
+- **Manufacturer certifications** across NCR, Vidyo, Lenel, RS2 and more.
 
-### Developer Experience
+> This repository is the source code for [barryhenry.com](https://www.barryhenry.com). It's both my portfolio and a working sample of how I build: typed end to end, validated at the edges, tested in CI and deployed automatically.
 
-- **Command Palette** - Press `⌘K` (Cmd+K) for quick navigation and search
-- **Dark/Light Theme** - Seamless theme switching with system preference detection
-- **Responsive Design** - Optimized for desktop, tablet, and mobile experiences
-- **Modern UI** - Built with shadcn/ui components for consistent, accessible design
+## Selected work
 
-### Technical Features
+| Project | What it is | Built with |
+| --- | --- | --- |
+| **[TelemetryTaco](https://github.com/Agile-Flimflam/TelemetryTaco)** · open source | Self-hosted product analytics, a focused alternative to PostHog. Batch event ingestion with idempotency, a queue-backed Python SDK, and a one-command Docker Compose stack. | Python, Django Ninja, Celery, Redis, PostgreSQL, React |
+| **Happy Harvest** · in development | Mobile-first planning app for farmers and gardeners that pairs modern tooling with the Hawaiian moon calendar (Mahina). | React Native (Expo), Fastify, PostgreSQL, Drizzle, Better Auth |
+| **Happy Scheduler** · in development | Schedule one post to Instagram, Facebook and TikTok across several businesses, published exactly once by a Postgres-backed cron. | Next.js, Prisma, PostgreSQL, Playwright |
+| **Banking ops tooling** · internal | On-the-job tools: PII detection and redaction for legacy logs, ATM transaction middleware for automated deposits, and a real-time status dashboard for video teller infrastructure. | C#, Python, PowerShell, Azure |
+| **This portfolio** · live | The site you're reading about. Details below. | Next.js, Tailwind, shadcn/ui, Redis, Docker |
 
-- **Type-Safe** - Full TypeScript implementation with strict type checking
-- **Performance Optimized** - Built with Next.js App Router for optimal loading and SEO
-- **Accessibility** - WCAG compliant with proper ARIA labels and keyboard navigation
-- **SEO Ready** - Optimized meta tags and structured data
+Each project has a full case study (problem, my role, architecture, status) on the [Projects page](https://www.barryhenry.com/projects).
 
-## 🛠 Tech Stack
+## About this site
 
-### Core Framework
+The portfolio is designed to feel like a **SaaS product dashboard**, because that's the world I work in.
 
-- **[Next.js 16.1.1](https://nextjs.org/)** - React framework with App Router for optimal performance and SEO
-- **[React 19.2.3](https://react.dev/)** - Modern React with concurrent features and improved performance
-- **[TypeScript 5.0](https://www.typescriptlang.org/)** - Type-safe JavaScript with strict type checking
+- **Overview dashboard** with headline metrics, a tech radar, a milestone changelog and a **live "Latest commits" feed** pulled from my public GitHub repos.
+- **Project case studies** at `/projects/[id]`, statically generated from typed content.
+- **Experience timeline** styled as a versioned changelog (`v1.0.0` → `v7.0.0`).
+- **Stack page** where every skill is backed by a named role or project, not a buzzword list.
+- **Printable one-page resume** at `/resume`, with a print-to-PDF button.
+- **Command palette** (`⌘K` / `Ctrl+K`) for keyboard-first navigation.
+- **Public JSON API** at [`/api/me`](https://www.barryhenry.com/api/me): my profile as data, Zod-validated and rate limited.
+- **Dark and light themes** that follow the system preference.
 
-### Styling & UI
+### Engineering highlights
 
-- **[Tailwind CSS 4.0](https://tailwindcss.com/)** - Utility-first CSS framework for rapid UI development
-- **[shadcn/ui](https://ui.shadcn.com/)** - Re-usable components built on Radix UI and styled with Tailwind
-- **[Radix UI](https://www.radix-ui.com/)** - Unstyled, accessible UI primitives for building high-quality design systems
-- **[Lucide React](https://lucide.dev/)** - Beautiful & consistent icon toolkit made by the community
+| Area | What's in place |
+| --- | --- |
+| **Accessibility** | Lighthouse accessibility score of 100. Labelled controls, keyboard navigation and visible focus throughout. |
+| **SEO** | Per-page metadata, a generated Open Graph image, `robots.txt`, `sitemap.xml` and JSON-LD `Person` structured data. |
+| **API design** | `/api/me` validates its environment and data with Zod, sends CORS and no-store headers, and returns `429` with `Retry-After` when limits are hit. |
+| **Rate limiting** | Redis-backed when `REDIS_URL` is set, with an automatic in-memory fallback, so the site never depends on Redis to stay up. |
+| **Live data, safely** | The commits feed only reads repos already linked as public on a project card, so it can't expose private work. Cached for an hour to stay well under GitHub's API limits, and degrades to an empty state if GitHub is down. |
+| **Analytics** | PostHog, enabled only when a key is supplied at build time, so local dev and forks send nothing. |
+| **Content integrity** | All content lives in typed modules (`src/lib/*.ts`) sourced from my resume. No hardcoded copy scattered through components. |
+| **Supply chain** | GitHub Actions pinned to commit SHAs, least-privilege workflow permissions, dependency audit and TruffleHog secret scanning on every PR. |
 
-### Animation & Interaction
+### Architecture
 
-- **[Framer Motion](https://www.framer.com/motion/)** - Production-ready motion library for React
-- **[next-themes](https://github.com/pacocoursey/next-themes)** - Perfect dark/light mode for Next.js
+```mermaid
+flowchart LR
+    visitor([Visitor]) --> app
 
-### Development & Quality
+    subgraph railway[Railway · Docker container]
+        app[Next.js 16 App Router<br/>React Server Components]
+        api["/api/me<br/>Zod + rate limiter"]
+    end
 
-- **[ESLint 9.0](https://eslint.org/)** - Pluggable JavaScript linter for code quality
-- **[Husky](https://typicode.github.io/husky/)** - Modern native Git hooks made easy
-- **[pnpm 9.15.0](https://pnpm.io/)** - Fast, disk space efficient package manager
-
-### Utilities
-
-- **[date-fns](https://date-fns.org/)** - Modern JavaScript date utility library
-- **[class-variance-authority](https://cva.style/)** - Class variance authority for building reusable component variants
-- **[cmdk](https://cmdk.paco.me/)** - Command palette component for React
-
-### Infrastructure
-
-- **[Node.js 20.18.0](https://nodejs.org/)** - JavaScript runtime built on Chrome's V8 JavaScript engine
-- **[Vercel](https://vercel.com/)** - Platform for deploying and hosting web applications
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js 20.18.0+** - Required runtime environment
-- **pnpm 9.15.0+** - Package manager (recommended)
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/BarryHenryJr/barryhenry-portfolio-web.git
-   cd barryhenry-portfolio-web
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   pnpm install
-   ```
-
-3. **Start the development server**
-
-   ```bash
-   pnpm dev
-   ```
-
-4. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000) to see the portfolio.
-
-### Development Features
-
-- **Hot Reload** - Changes are automatically reflected in the browser
-- **TypeScript** - Full type checking and IntelliSense support
-- **Command Palette** - Press `⌘K` (Cmd+K) for quick navigation and search
-- **Theme Switching** - Toggle between dark/light modes in the UI
-
-### Available Scripts
-
-```bash
-# Development
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm lint         # Run ESLint
-pnpm prepare      # Setup Git hooks (Husky)
+    app --> content[(Typed content<br/>src/lib/*.ts)]
+    app -- "hourly ISR fetch" --> github[GitHub REST API]
+    api -. "optional" .-> redis[(Redis)]
+    visitor -. "client analytics" .-> posthog[PostHog]
 ```
 
-## 📁 Project Structure
+### Delivery pipeline
+
+```mermaid
+flowchart LR
+    pr[Pull request] --> lint[Lint] --> build[Build]
+    pr --> audit[Dependency audit]
+    pr --> secrets[Secret scan]
+    pr --> preview[Railway preview env]
+    build --> main[Merge to main]
+    main --> rp[release-please<br/>changelog + version]
+    main --> deploy[Railway deploy<br/>from Dockerfile]
+```
+
+Every pull request gets lint, a production build, a dependency audit, secret scanning and its own Railway preview environment. Merges to `main` deploy automatically, and [release-please](https://github.com/googleapis/release-please) turns conventional commits into versioned releases and the [CHANGELOG](CHANGELOG.md).
+
+## Tech stack
+
+| Layer | Tools |
+| --- | --- |
+| **Framework** | Next.js 16 (App Router, Turbopack), React 19, TypeScript (strict) |
+| **UI** | Tailwind CSS 4, shadcn/ui on Radix UI, Framer Motion, Lucide icons, cmdk, next-themes |
+| **Data & validation** | Zod, typed content modules, GitHub REST API with incremental static regeneration |
+| **Backend** | Next.js route handlers, fixed-window rate limiter on Redis (`redis` client) with an in-memory fallback |
+| **Observability** | PostHog product analytics |
+| **Tooling** | pnpm 9.15, ESLint 9, Husky pre-commit hooks |
+| **CI/CD & hosting** | GitHub Actions, release-please, Docker, Railway |
+
+## Run it locally
+
+**Prerequisites:** Node.js 20.18+ and pnpm 9.15.0.
+
+```bash
+git clone https://github.com/BarryHenryJr/barryhenry-portfolio-web.git
+cd barryhenry-portfolio-web
+pnpm install
+pnpm dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000). No environment variables are needed to run it.
+
+### Optional environment variables
+
+| Variable | Purpose |
+| --- | --- |
+| `REDIS_URL` | Use Redis for `/api/me` rate limiting instead of the in-memory fallback. |
+| `GITHUB_TOKEN` | Raise the GitHub API limit for the "Latest commits" feed. |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Turn on PostHog analytics. Read at **build** time, so it must be passed as a Docker build arg. |
+| `NEXT_PUBLIC_POSTHOG_HOST` | PostHog ingestion host. Defaults to `https://us.i.posthog.com`. |
+
+### Scripts
+
+```bash
+pnpm dev        # Start the dev server
+pnpm build      # Production build
+pnpm start      # Serve the production build
+pnpm lint       # ESLint (also runs on pre-commit)
+```
+
+### Project structure
 
 ```
 src/
-├── app/                          # Next.js App Router pages
-│   ├── api/                      # API routes (if needed)
-│   ├── experience/               # Experience timeline page
-│   │   ├── components/           # Experience-specific components
-│   │   └── page.tsx             # Experience page
-│   ├── favicon.ico              # Site favicon
-│   ├── globals.css              # Global styles
-│   ├── layout.tsx               # Root layout component
-│   ├── page.tsx                 # Homepage (dashboard)
-│   └── projects/                # Projects showcase page
-│       ├── components/          # Project-specific components
-│       └── page.tsx            # Projects page
-├── components/                  # Reusable React components
-│   ├── command-menu.tsx         # Global command palette
-│   ├── dashboard/               # Dashboard widgets
-│   │   ├── ActivityFeed.tsx     # Activity feed component
-│   │   └── TechRadar.tsx        # Technology radar component
-│   ├── layout/                  # Layout components
-│   │   ├── Shell.tsx            # Main app shell
-│   │   ├── Sidebar.tsx          # Navigation sidebar
-│   │   └── StatusBar.tsx        # Status bar component
-│   ├── theme-provider.tsx       # Theme provider for dark/light mode
-│   └── ui/                      # shadcn/ui components
-│       ├── badge.tsx
-│       ├── button.tsx
-│       ├── card.tsx
-│       └── ...
-└── lib/                         # Utilities and constants
-    ├── constants.ts             # App constants and data
-    └── utils.ts                 # Utility functions
+├── app/                 # App Router pages, API route, OG image, robots, sitemap
+│   ├── api/me/          # Public JSON profile API
+│   ├── projects/[id]/   # Case study pages
+│   ├── experience/      # Changelog-style timeline
+│   ├── stack/           # Skills, each tied to a role or project
+│   ├── resume/          # Printable one-page resume
+│   └── contact/
+├── components/
+│   ├── dashboard/       # Tech radar, activity feed, live commits
+│   ├── layout/          # Shell, sidebar, status bar
+│   └── ui/              # shadcn/ui primitives
+└── lib/                 # Typed content, case studies, resume, GitHub client
 ```
 
-### Key Directories
+## Let's talk
 
-- **`app/`** - Next.js 13+ App Router structure with page components
-- **`components/`** - Modular component architecture with clear separation of concerns
-- **`lib/`** - Shared utilities, constants, and business logic
-- **`ui/`** - Design system components from shadcn/ui
+I'm open to **solutions engineering and full-stack roles**, and to **freelance builds** for teams that need someone who can scope it, build it and ship it.
 
-## 🔧 Development Workflow
+- **Website:** [barryhenry.com](https://www.barryhenry.com)
+- **Email:** [barryhenryjr@gmail.com](mailto:barryhenryjr@gmail.com)
+- **LinkedIn:** [linkedin.com/in/barrynhenry](https://linkedin.com/in/barrynhenry)
 
-### Code Quality & Git Hooks
-
-This project uses [Husky](https://typicode.github.io/husky/) to manage Git hooks for code quality and consistency.
-
-#### Setup
-
-Git hooks are automatically configured when you run:
-
-```bash
-pnpm install    # Installs dependencies
-pnpm prepare    # Sets up Husky git hooks
-```
-
-#### Pre-commit Hook
-
-The pre-commit hook automatically runs ESLint to ensure code quality:
-
-```bash
-pnpm lint  # Runs automatically on pre-commit
-```
-
-If linting fails, the commit will be blocked. Fix the issues and try committing again.
-
-#### Additional Hooks (Optional)
-
-You can add more Git hooks by creating files in the `.husky/` directory:
-
-- `commit-msg`: Validate commit messages
-- `pre-push`: Run additional checks before pushing
-
-Example commit-msg hook for conventional commits:
-
-```bash
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-# Add commitlint or custom validation here
-```
-
-## 🚀 Deployment
-
-This portfolio is optimized for deployment on [Vercel](https://vercel.com/), the platform built by the creators of Next.js.
-
-### Automatic Deployment
-
-The project is configured for continuous deployment with GitHub Actions:
-
-1. **Push to main branch** - Triggers automated CI/CD pipeline
-2. **Build verification** - Runs linting, type checking, and build tests
-3. **Security scanning** - Performs vulnerability and secret scanning
-4. **Auto-deployment** - Successful builds deploy automatically to Vercel
-
-### Manual Deployment
-
-To deploy manually:
-
-1. **Connect to Vercel**
-
-   ```bash
-   # Install Vercel CLI
-   pnpm add -g vercel
-
-   # Login to Vercel
-   vercel login
-
-   # Deploy
-   vercel --prod
-   ```
-
-2. **Environment Variables** (if needed)
-   Configure any required environment variables in your Vercel project settings.
-
-### Build Configuration
-
-The project includes optimized build settings for:
-
-- **Static generation** - Fast loading with Next.js App Router
-- **Image optimization** - Automatic image optimization and WebP conversion
-- **SEO optimization** - Proper meta tags and structured data
-- **Performance** - Bundle analysis and optimization
-
-### Custom Domain
-
-To use a custom domain:
-
-1. Add your domain in Vercel project settings
-2. Configure DNS records as instructed
-3. Enable SSL certificate (automatic)
-
-For detailed deployment documentation, see [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying).
+A full resume is available on request.
