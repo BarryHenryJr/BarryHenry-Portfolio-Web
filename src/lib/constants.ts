@@ -80,14 +80,14 @@ export const METRICS: Metric[] = [
   {
     id: "itm",
     label: "NCR ITM implementations led",
-    value: "~108",
-    detail: "All but one of the company's total",
+    value: "100+",
+    detail: "Nearly all of the company's rollouts",
   },
   {
     id: "imaging",
     label: "Check imaging rollouts",
-    value: "~85",
-    detail: "100% of Conveyance implementations",
+    value: "80+",
+    detail: "Every Conveyance implementation to date",
   },
   {
     id: "certs",
