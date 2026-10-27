@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/compare/barryhenry-portfolio-web-v0.3.0...barryhenry-portfolio-web-v0.4.0) (2026-10-27)
+
+
+### Features
+
+* **experience:** show teaser-level detail for each position ([#35](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/issues/35)) ([0ce928c](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/commit/0ce928cc18606bf80fd7682a5b591c27cad3dd8f))
+
 ## [0.3.0](https://github.com/BarryHenryJr/BarryHenry-Portfolio-Web/compare/barryhenry-portfolio-web-v0.2.0...barryhenry-portfolio-web-v0.3.0) (2026-10-27)
 
 
