@@ -1,4 +1,4 @@
-![version](https://img.shields.io/badge/version-0.3.0-blue)
+![version](https://img.shields.io/badge/version-0.4.0-blue)
 ![build](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main)
 ![lint](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main&job=lint)
 ![security](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main&job=security-audit)
