@@ -1,6 +1,6 @@
 // The public /resume page (and its PDF) is a teaser, not the full master resume. Barry chose to keep
 // exact counts, awards, dollar amounts and older-role detail off the public download; the full
-// version is shared on request. The Experience page still reads from EXPERIENCE in constants.ts.
+// version is shared on request. EXPERIENCE in constants.ts (Experience page, /api/me) is kept at the same teaser level.
 
 export interface ResumeRole {
   id: string;
