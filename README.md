@@ -8,7 +8,7 @@ A decade of leading banking technology rollouts, plus full-stack products I desi
 
 [**View the live site →**](https://www.barryhenry.com) &nbsp;·&nbsp; [Resume](https://www.barryhenry.com/resume) &nbsp;·&nbsp; [Projects](https://www.barryhenry.com/projects) &nbsp;·&nbsp; [Get in touch](https://www.barryhenry.com/contact)
 
-![version](https://img.shields.io/badge/version-0.4.0-blue)
+![version](https://img.shields.io/badge/version-0.5.0-blue)
 [![CI/CD](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml/badge.svg?branch=main)](https://github.com/BarryHenryJr/barryhenry-portfolio-web/actions/workflows/cicd.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16.4-black?logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
