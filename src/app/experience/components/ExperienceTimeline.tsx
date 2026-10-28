@@ -75,13 +75,11 @@ export function ExperienceTimeline({ items }: ExperienceTimelineProps) {
             </CardHeader>
 
             <CardContent className="pb-4">
-              <ul className="list-disc pl-5 space-y-1">
-                {item.description.map((desc, descIndex) => (
-                  <li key={`${item.id}-desc-${descIndex}`} className="text-sm text-muted-foreground">
-                    {desc}
-                  </li>
-                ))}
-              </ul>
+              {item.description.map((desc, descIndex) => (
+                <p key={`${item.id}-desc-${descIndex}`} className="text-sm text-muted-foreground">
+                  {desc}
+                </p>
+              ))}
             </CardContent>
 
             <CardFooter className="pt-4">

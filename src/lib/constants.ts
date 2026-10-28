@@ -279,14 +279,8 @@ export const EXPERIENCE: ExperienceItem[] = [
     role: "Senior Professional Services Consultant",
     period: "Apr 2017 – Present",
     version: "v7.0.0",
-    summary:
-      "Sells, implements and supports NCR Interactive Teller Machines and Cook's own Conveyance check imaging for community banks and credit unions nationwide.",
     description: [
-      "Led nearly all of the company's NCR Interactive Teller Machine and Conveyance check imaging rollouts.",
-      "Join qualified pre-sales calls for demos, technical discovery, scoping, solution design and RFP responses.",
-      "Stand up each customer's Azure environment and live teller video infrastructure, then own the rollout through go-live.",
-      "Built C#, Python and PowerShell tools that fixed customer problems before permanent product fixes shipped.",
-      "Original and longest-tenured member of the team; built its processes and trained everyone on it.",
+      "Leads banking technology implementations for community banks and credit unions, from pre-sales through go-live.",
     ],
     tech: ["Azure", "Azure SQL", "PowerShell", "Python", "C#", "REST & SOAP APIs", "NCR ITM"],
   },
@@ -298,7 +292,7 @@ export const EXPERIENCE: ExperienceItem[] = [
     location: "Maui",
     version: "v6.0.0",
     description: [
-      "Natural farming business on Maui, operating through GoFarm Hawaiʻi's AgIncubator program.",
+      "Natural farming business on Maui.",
     ],
     tech: ["Korean Natural Farming", "JADAM"],
   },
@@ -309,9 +303,8 @@ export const EXPERIENCE: ExperienceItem[] = [
     period: "Oct 2023 – Oct 2025",
     location: "Maui",
     version: "v5.0.0",
-    summary: "Maui nonprofit food hub.",
     description: [
-      "Led technology modernization and grant funding for the organization's software.",
+      "Led technology and grant funding for a Maui nonprofit food hub.",
     ],
     tech: ["Google Workspace", "Microsoft 365", "Stripe", "Google Sheets API"],
   },
@@ -322,8 +315,7 @@ export const EXPERIENCE: ExperienceItem[] = [
     period: "Apr 2016 – Apr 2017",
     version: "v4.0.0",
     description: [
-      "Installed, maintained and sold bank security equipment.",
-      "Led the company's expansion into Arizona, its first market beyond the West Coast.",
+      "Installed and sold bank security equipment, and led the company's expansion into Arizona.",
     ],
     tech: ["Access control", "CCTV", "Alarm systems"],
   },
@@ -345,7 +337,7 @@ export const EXPERIENCE: ExperienceItem[] = [
     period: "Apr 2008 – Dec 2014",
     version: "v2.0.0",
     description: [
-      "Managed bank branches, owning sales, service, risk and compliance.",
+      "Managed bank branches and their teams.",
     ],
     tech: ["P&L", "Compliance", "Team leadership"],
   },
@@ -357,7 +349,7 @@ export const EXPERIENCE: ExperienceItem[] = [
     location: "Tempe, AZ",
     version: "v1.0.0",
     description: [
-      "Ran day-to-day operations and grew the business for a security services company.",
+      "Ran operations for a growing security services company.",
     ],
     tech: ["Security integration", "Sales", "Operations"],
   },
